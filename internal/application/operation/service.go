@@ -222,6 +222,78 @@ func (s *Service) recordAction(action operation.Action) {
 	}
 }
 
+func (s *Service) PurgePods(ctx context.Context, namespace string, states []string) (*PurgePodsResult, error) {
+	s.log.Info("Purging pods", "namespace", namespace, "states", states)
+
+	if len(states) == 0 {
+		states = []string{"Evicted", "Error", "Completed", "OOMKilled", "ContainerStatusUnknown", "Terminating"}
+	}
+
+	ns := namespace
+	if ns == "" {
+		ns = "all namespaces"
+	}
+
+	action := operation.NewAction(operation.ActionTypeDelete, "Pod", namespace, "purge")
+	action.SetParameter("states", states)
+	action.Start()
+
+	results, err := s.k8sAdapter.PurgePods(ctx, namespace, states)
+
+	purgeResult := &PurgePodsResult{
+		ActionID:     action.ID,
+		Namespace:    ns,
+		States:       states,
+		DeletedPods:  make([]PurgedPod, 0),
+		FailedPods:   make([]PurgedPod, 0),
+		TotalDeleted: 0,
+		TotalFailed:  0,
+	}
+
+	if err != nil {
+		action.Fail(err.Error())
+		return nil, err
+	}
+
+	for _, r := range results {
+		pod := PurgedPod{
+			Namespace: r.Namespace,
+			Name:      r.Name,
+			Reason:    r.Reason,
+		}
+		if r.Deleted {
+			purgeResult.DeletedPods = append(purgeResult.DeletedPods, pod)
+			purgeResult.TotalDeleted++
+		} else {
+			pod.Error = r.Error
+			purgeResult.FailedPods = append(purgeResult.FailedPods, pod)
+			purgeResult.TotalFailed++
+		}
+	}
+
+	action.Complete(fmt.Sprintf("Purged %d pods (%d failed)", purgeResult.TotalDeleted, purgeResult.TotalFailed))
+	s.recordAction(*action)
+
+	return purgeResult, nil
+}
+
+type PurgePodsResult struct {
+	ActionID     string
+	Namespace    string
+	States       []string
+	DeletedPods  []PurgedPod
+	FailedPods   []PurgedPod
+	TotalDeleted int
+	TotalFailed  int
+}
+
+type PurgedPod struct {
+	Namespace string
+	Name      string
+	Reason    string
+	Error     string
+}
+
 func (s *Service) auditAction(ctx context.Context, action *operation.Action, result *operation.ActionResult) {
 	if s.auditStore == nil {
 		return

@@ -12,6 +12,7 @@ import (
 	"github.com/tonymora/celia/internal/adapters/secondary/kubernetes"
 	"github.com/tonymora/celia/internal/application/cluster"
 	"github.com/tonymora/celia/internal/application/observability"
+	"github.com/tonymora/celia/internal/application/operation"
 	"github.com/tonymora/celia/internal/application/resource"
 	"github.com/tonymora/celia/internal/application/trouble"
 	"github.com/tonymora/celia/pkg/config"
@@ -60,6 +61,7 @@ func main() {
 	resourceService := resource.NewService(k8sAdapter, log)
 	observabilityService := observability.NewService(k8sAdapter, log)
 	troubleService := trouble.NewService(k8sAdapter, log, cfg.Trouble)
+	operationService := operation.NewService(k8sAdapter, log)
 
 	if cfg.Trouble.Enabled {
 		go troubleService.StartDetection(ctx)
@@ -72,6 +74,7 @@ func main() {
 		resourceService,
 		observabilityService,
 		troubleService,
+		operationService,
 	)
 
 	go func() {

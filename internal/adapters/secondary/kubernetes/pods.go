@@ -64,6 +64,107 @@ func (a *Adapter) DeletePod(ctx context.Context, namespace, name string, gracePe
 	return nil
 }
 
+func (a *Adapter) PurgePods(ctx context.Context, namespace string, states []string) ([]PurgeResult, error) {
+	clientset, err := a.getClientset()
+	if err != nil {
+		return nil, err
+	}
+
+	pods, err := clientset.CoreV1().Pods(namespace).List(ctx, metav1.ListOptions{})
+	if err != nil {
+		return nil, fmt.Errorf("failed to list pods: %w", err)
+	}
+
+	var results []PurgeResult
+	for _, pod := range pods.Items {
+		shouldDelete := false
+		var reason string
+
+		for _, state := range states {
+			switch state {
+			case "Evicted":
+				if pod.Status.Reason == "Evicted" {
+					shouldDelete = true
+					reason = "Evicted"
+				}
+			case "Error":
+				if pod.Status.Phase == corev1.PodFailed {
+					shouldDelete = true
+					reason = "Error/Failed"
+				}
+			case "Completed":
+				if pod.Status.Phase == corev1.PodSucceeded {
+					shouldDelete = true
+					reason = "Completed"
+				}
+			case "OOMKilled":
+				for _, cs := range pod.Status.ContainerStatuses {
+					if cs.LastTerminationState.Terminated != nil && cs.LastTerminationState.Terminated.Reason == "OOMKilled" {
+						shouldDelete = true
+						reason = "OOMKilled"
+						break
+					}
+				}
+			case "ContainerStatusUnknown":
+				for _, cs := range pod.Status.ContainerStatuses {
+					if cs.State.Waiting != nil && cs.State.Waiting.Reason == "ContainerStatusUnknown" {
+						shouldDelete = true
+						reason = "ContainerStatusUnknown"
+						break
+					}
+				}
+			case "Terminating":
+				if pod.DeletionTimestamp != nil {
+					shouldDelete = true
+					reason = "Terminating"
+				}
+			case "PodInitializing":
+				for _, cs := range pod.Status.ContainerStatuses {
+					if cs.State.Waiting != nil && cs.State.Waiting.Reason == "PodInitializing" {
+						shouldDelete = true
+						reason = "PodInitializing"
+						break
+					}
+				}
+			}
+			if shouldDelete {
+				break
+			}
+		}
+
+		if shouldDelete {
+			result := PurgeResult{
+				Namespace: pod.Namespace,
+				Name:      pod.Name,
+				Reason:    reason,
+			}
+
+			gracePeriod := int64(0)
+			err := clientset.CoreV1().Pods(pod.Namespace).Delete(ctx, pod.Name, metav1.DeleteOptions{
+				GracePeriodSeconds: &gracePeriod,
+			})
+			if err != nil {
+				result.Error = err.Error()
+				result.Deleted = false
+			} else {
+				result.Deleted = true
+			}
+
+			results = append(results, result)
+		}
+	}
+
+	return results, nil
+}
+
+type PurgeResult struct {
+	Namespace string
+	Name      string
+	Reason    string
+	Deleted   bool
+	Error     string
+}
+
 func (a *Adapter) GetPodLogs(ctx context.Context, namespace, pod, container string, opts outbound.LogOptions) (io.ReadCloser, error) {
 	clientset, err := a.getClientset()
 	if err != nil {
