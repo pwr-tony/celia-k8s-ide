@@ -9,6 +9,7 @@ interface SelectedResource {
 interface SelectionState {
   selected: SelectedResource | null
   hoveredPod: string | null
+  activeResourceType: string | null
 
   select: (resource: SelectedResource | null) => void
   selectPod: (namespace: string, name: string) => void
@@ -17,11 +18,13 @@ interface SelectionState {
   selectNode: (name: string) => void
   clearSelection: () => void
   setHoveredPod: (pod: string | null) => void
+  setActiveResourceType: (resourceType: string | null) => void
 }
 
 export const useSelectionStore = create<SelectionState>((set) => ({
   selected: null,
   hoveredPod: null,
+  activeResourceType: null,
 
   select: (selected) => set({ selected }),
 
@@ -40,4 +43,6 @@ export const useSelectionStore = create<SelectionState>((set) => ({
   clearSelection: () => set({ selected: null }),
 
   setHoveredPod: (hoveredPod) => set({ hoveredPod }),
+
+  setActiveResourceType: (activeResourceType) => set({ activeResourceType }),
 }))

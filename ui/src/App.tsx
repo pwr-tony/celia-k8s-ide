@@ -1,8 +1,7 @@
-import { useContexts, useConnection, useClusterHealth } from '@/api/hooks'
+import { useConnection, useClusterHealth } from '@/api/hooks'
 import { useProblems } from '@/api/hooks'
-import { Button } from '@/components/primitives'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives'
-import { useConnect } from '@/api/hooks'
+import { Button, TooltipProvider } from '@/components/primitives'
+import { Sidebar } from '@/components/layout'
 import { AlertCircle, CheckCircle2, Loader2, Server, Box, AlertTriangle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -33,32 +32,6 @@ function ConnectionStatus() {
       <span className="font-medium">{connection.context}</span>
       <span className="text-text-tertiary">({connection.cluster})</span>
     </div>
-  )
-}
-
-function ContextSelector() {
-  const { data: contexts, isLoading } = useContexts()
-  const { mutate: connect, isPending } = useConnect()
-
-  if (isLoading) return <div className="h-9 w-48 animate-pulse bg-bg-tertiary rounded-md" />
-
-  return (
-    <Select
-      value={contexts?.current ?? ''}
-      onValueChange={(value) => connect(value)}
-      disabled={isPending}
-    >
-      <SelectTrigger className="w-64">
-        <SelectValue placeholder="Select context" />
-      </SelectTrigger>
-      <SelectContent>
-        {contexts?.contexts.map((ctx) => (
-          <SelectItem key={ctx.name} value={ctx.name}>
-            {ctx.name}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
   )
 }
 
@@ -189,47 +162,50 @@ function ProblemsList() {
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-bg-primary">
-      <header className="border-b border-border-subtle bg-bg-secondary">
-        <div className="flex items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-6">
-            <h1 className="text-xl font-bold text-text-primary">Celia</h1>
-            <ContextSelector />
-          </div>
-          <ConnectionStatus />
-        </div>
-      </header>
+    <TooltipProvider delayDuration={0}>
+      <div className="flex h-screen bg-bg-primary">
+        <Sidebar />
 
-      <main className="p-6 space-y-6">
-        <ClusterStats />
-
-        <div className="grid grid-cols-3 gap-6">
-          <div className="col-span-2">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold">Problems</h2>
-              <Button variant="ghost" size="sm">
-                View all
-              </Button>
+        <div className="flex-1 flex flex-col min-w-0">
+          <header className="shrink-0 border-b border-border-subtle bg-bg-secondary">
+            <div className="flex items-center justify-between px-6 py-4">
+              <h1 className="text-lg font-semibold text-text-primary">Dashboard</h1>
+              <ConnectionStatus />
             </div>
-            <ProblemsList />
-          </div>
+          </header>
 
-          <div>
-            <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
-            <div className="card p-4 space-y-2">
-              <Button variant="secondary" className="w-full justify-start">
-                Scale Deployment
-              </Button>
-              <Button variant="secondary" className="w-full justify-start">
-                Rollout Restart
-              </Button>
-              <Button variant="danger" className="w-full justify-start">
-                Purge Failed Pods
-              </Button>
+          <main className="flex-1 overflow-auto p-6 space-y-6">
+            <ClusterStats />
+
+            <div className="grid grid-cols-3 gap-6">
+              <div className="col-span-2">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-semibold">Problems</h2>
+                  <Button variant="ghost" size="sm">
+                    View all
+                  </Button>
+                </div>
+                <ProblemsList />
+              </div>
+
+              <div>
+                <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
+                <div className="card p-4 space-y-2">
+                  <Button variant="secondary" className="w-full justify-start">
+                    Scale Deployment
+                  </Button>
+                  <Button variant="secondary" className="w-full justify-start">
+                    Rollout Restart
+                  </Button>
+                  <Button variant="danger" className="w-full justify-start">
+                    Purge Failed Pods
+                  </Button>
+                </div>
+              </div>
             </div>
-          </div>
+          </main>
         </div>
-      </main>
-    </div>
+      </div>
+    </TooltipProvider>
   )
 }

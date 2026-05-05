@@ -22,7 +22,6 @@ export const ConnectionSchema = z.object({
 
 export const NamespacesResponseSchema = z.object({
   namespaces: z.array(z.string()),
-  current: z.string(),
 })
 
 export const ClusterHealthSchema = z.object({
