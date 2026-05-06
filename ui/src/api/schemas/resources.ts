@@ -167,6 +167,33 @@ export const ResourceYAMLSchema = z.object({
   yaml: z.string(),
 })
 
+export const ConfigMapSchema = z.object({
+  name: z.string(),
+  namespace: z.string(),
+  data: z.record(z.string(), z.string()),
+  created_at: z.string(),
+  labels: z.record(z.string(), z.string()),
+})
+
+export const ConfigMapsResponseSchema = z.object({
+  configmaps: z.array(ConfigMapSchema),
+  total: z.number(),
+})
+
+export const SecretSchema = z.object({
+  name: z.string(),
+  namespace: z.string(),
+  type: z.string(),
+  data_keys: z.array(z.string()),
+  created_at: z.string(),
+  labels: z.record(z.string(), z.string()),
+})
+
+export const SecretsResponseSchema = z.object({
+  secrets: z.array(SecretSchema),
+  total: z.number(),
+})
+
 export type Pod = z.infer<typeof PodSchema>
 export type PodsResponse = z.infer<typeof PodsResponseSchema>
 export type Deployment = z.infer<typeof DeploymentSchema>
@@ -177,3 +204,7 @@ export type Node = z.infer<typeof NodeSchema>
 export type NodesResponse = z.infer<typeof NodesResponseSchema>
 export type Event = z.infer<typeof EventSchema>
 export type EventsResponse = z.infer<typeof EventsResponseSchema>
+export type ConfigMap = z.infer<typeof ConfigMapSchema>
+export type ConfigMapsResponse = z.infer<typeof ConfigMapsResponseSchema>
+export type Secret = z.infer<typeof SecretSchema>
+export type SecretsResponse = z.infer<typeof SecretsResponseSchema>

@@ -7,11 +7,15 @@ import {
   NodesResponseSchema,
   EventsResponseSchema,
   ResourceYAMLSchema,
+  ConfigMapsResponseSchema,
+  SecretsResponseSchema,
   type PodsResponse,
   type DeploymentsResponse,
   type ServicesResponse,
   type NodesResponse,
   type EventsResponse,
+  type ConfigMapsResponse,
+  type SecretsResponse,
 } from '../schemas'
 
 export const resourceKeys = {
@@ -24,6 +28,12 @@ export const resourceKeys = {
   services: (namespace?: string) => [...resourceKeys.all, 'services', namespace] as const,
   service: (namespace: string, name: string) =>
     [...resourceKeys.all, 'service', namespace, name] as const,
+  configmaps: (namespace?: string) => [...resourceKeys.all, 'configmaps', namespace] as const,
+  configmap: (namespace: string, name: string) =>
+    [...resourceKeys.all, 'configmap', namespace, name] as const,
+  secrets: (namespace?: string) => [...resourceKeys.all, 'secrets', namespace] as const,
+  secret: (namespace: string, name: string) =>
+    [...resourceKeys.all, 'secret', namespace, name] as const,
   nodes: () => [...resourceKeys.all, 'nodes'] as const,
   node: (name: string) => [...resourceKeys.all, 'node', name] as const,
   events: (namespace?: string) => [...resourceKeys.all, 'events', namespace] as const,
@@ -75,6 +85,24 @@ export function useEvents(namespace?: string) {
   })
 }
 
+export function useConfigMaps(namespace?: string) {
+  const query = namespace ? `?namespace=${namespace}` : ''
+  return useQuery({
+    queryKey: resourceKeys.configmaps(namespace),
+    queryFn: () => get<ConfigMapsResponse>(`/configmaps${query}`, ConfigMapsResponseSchema),
+    refetchInterval: 30000,
+  })
+}
+
+export function useSecrets(namespace?: string) {
+  const query = namespace ? `?namespace=${namespace}` : ''
+  return useQuery({
+    queryKey: resourceKeys.secrets(namespace),
+    queryFn: () => get<SecretsResponse>(`/secrets${query}`, SecretsResponseSchema),
+    refetchInterval: 30000,
+  })
+}
+
 export function useResourceYAML(kind: string, namespace: string, name: string) {
   return useQuery({
     queryKey: resourceKeys.yaml(kind, namespace, name),
@@ -82,4 +110,52 @@ export function useResourceYAML(kind: string, namespace: string, name: string) {
       get<{ yaml: string }>(`/resources/${kind}/${namespace}/${name}/yaml`, ResourceYAMLSchema),
     enabled: Boolean(kind && namespace && name),
   })
+}
+
+export function usePod(namespace: string, name: string) {
+  const { data, ...rest } = usePods(namespace)
+  return {
+    data: data?.pods.find((p) => p.name === name),
+    ...rest,
+  }
+}
+
+export function useDeployment(namespace: string, name: string) {
+  const { data, ...rest } = useDeployments(namespace)
+  return {
+    data: data?.deployments.find((d) => d.name === name),
+    ...rest,
+  }
+}
+
+export function useService(namespace: string, name: string) {
+  const { data, ...rest } = useServices(namespace)
+  return {
+    data: data?.services.find((s) => s.name === name),
+    ...rest,
+  }
+}
+
+export function useConfigMap(namespace: string, name: string) {
+  const { data, ...rest } = useConfigMaps(namespace)
+  return {
+    data: data?.configmaps.find((c) => c.name === name),
+    ...rest,
+  }
+}
+
+export function useSecret(namespace: string, name: string) {
+  const { data, ...rest } = useSecrets(namespace)
+  return {
+    data: data?.secrets.find((s) => s.name === name),
+    ...rest,
+  }
+}
+
+export function useNode(name: string) {
+  const { data, ...rest } = useNodes()
+  return {
+    data: data?.nodes.find((n) => n.name === name),
+    ...rest,
+  }
 }

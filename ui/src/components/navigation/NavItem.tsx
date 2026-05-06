@@ -1,9 +1,10 @@
 import { type LucideIcon } from 'lucide-react'
+import { useNavigate, useLocation } from 'react-router'
 import { cn } from '@/lib/utils'
 import { useUIStore } from '@/stores/ui'
-import { useSelectionStore } from '@/stores/selection'
 import { SimpleTooltip } from '@/components/primitives'
 import { ProblemBadge } from './ProblemBadge'
+import { RESOURCE_TO_ROUTE } from '@/router/routes'
 
 interface NavItemProps {
   icon: LucideIcon
@@ -15,13 +16,21 @@ interface NavItemProps {
 
 export function NavItem({ icon: Icon, label, resourceType, count, problemCount = 0 }: NavItemProps) {
   const collapsed = useUIStore((s) => s.sidebarCollapsed)
-  const activeResourceType = useSelectionStore((s) => s.activeResourceType)
-  const setActiveResourceType = useSelectionStore((s) => s.setActiveResourceType)
-  const isActive = activeResourceType === resourceType
+  const navigate = useNavigate()
+  const location = useLocation()
+
+  const route = RESOURCE_TO_ROUTE[resourceType]
+  const isActive = route ? location.pathname.startsWith(route) : false
+
+  const handleClick = () => {
+    if (route) {
+      navigate(route)
+    }
+  }
 
   const content = (
     <button
-      onClick={() => setActiveResourceType(resourceType)}
+      onClick={handleClick}
       className={cn(
         'flex items-center gap-3 w-full px-3 py-2 rounded-md text-sm transition-colors',
         'text-text-secondary hover:bg-bg-hover hover:text-text-primary',
