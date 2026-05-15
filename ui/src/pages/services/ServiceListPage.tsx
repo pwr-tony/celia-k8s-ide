@@ -11,7 +11,7 @@ export function ServiceListPage() {
   const navigate = useNavigate()
 
   const handleRowClick = (service: Service) => {
-    navigate(serviceDetailPath(service.namespace, service.name))
+    navigate(serviceDetailPath(service.Namespace, service.Name))
   }
 
   return (
@@ -19,7 +19,7 @@ export function ServiceListPage() {
       <PageHeader title="Services" />
       <main className="flex-1 overflow-hidden p-6">
         <ResourceTable
-          data={data?.services ?? []}
+          data={data?.items ?? []}
           columns={serviceColumns}
           isLoading={isLoading}
           onRowClick={handleRowClick}

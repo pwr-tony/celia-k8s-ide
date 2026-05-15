@@ -13,11 +13,11 @@ const LogsResponseSchema = z.object({
 interface PodLogsTabProps {
   namespace: string
   podName: string
-  containers: Pod['containers']
+  containers: Pod['Containers']
 }
 
 export function PodLogsTab({ namespace, podName, containers }: PodLogsTabProps) {
-  const [selectedContainer, setSelectedContainer] = useState(containers?.[0]?.name ?? '')
+  const [selectedContainer, setSelectedContainer] = useState(containers?.[0]?.Name ?? '')
   const [tailLines, setTailLines] = useState('100')
   const logsEndRef = useRef<HTMLDivElement>(null)
 
@@ -67,8 +67,8 @@ export function PodLogsTab({ namespace, podName, containers }: PodLogsTabProps) 
           </SelectTrigger>
           <SelectContent>
             {containers.map((c) => (
-              <SelectItem key={c.name} value={c.name}>
-                {c.name}
+              <SelectItem key={c.Name} value={c.Name}>
+                {c.Name}
               </SelectItem>
             ))}
           </SelectContent>

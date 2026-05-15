@@ -49,20 +49,20 @@ export function useSidebarData() {
 
   const counts = useMemo<SidebarCounts>(() => {
     return {
-      pods: podsData?.pods.length ?? 0,
-      deployments: deploymentsData?.deployments.length ?? 0,
+      pods: podsData?.items.length ?? 0,
+      deployments: deploymentsData?.items.length ?? 0,
       statefulsets: 0,
       daemonsets: 0,
       jobs: 0,
       cronjobs: 0,
-      services: servicesData?.services.length ?? 0,
+      services: servicesData?.items.length ?? 0,
       ingresses: 0,
       endpoints: 0,
       configmaps: 0,
       secrets: 0,
       pvcs: 0,
       pvs: 0,
-      nodes: nodesData?.nodes.length ?? healthData?.nodes.total ?? 0,
+      nodes: nodesData?.items.length ?? healthData?.nodes.total ?? 0,
       namespaces: namespacesData?.namespaces.length ?? 0,
     }
   }, [podsData, deploymentsData, servicesData, nodesData, namespacesData, healthData])

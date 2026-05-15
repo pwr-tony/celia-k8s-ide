@@ -7,8 +7,8 @@ import { Loader2, Tag, Network } from 'lucide-react'
 import type { Service } from '@/api/schemas'
 
 function ServiceOverview({ service }: { service: Service }) {
-  const labelEntries = Object.entries(service.labels || {})
-  const selectorEntries = Object.entries(service.selector || {})
+  const labelEntries = Object.entries(service.Labels || {})
+  const selectorEntries = Object.entries(service.Selector || {})
 
   return (
     <div className="p-6 space-y-6 overflow-auto">
@@ -17,15 +17,15 @@ function ServiceOverview({ service }: { service: Service }) {
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           <div className="card p-4">
             <span className="text-sm text-text-tertiary">Type</span>
-            <p className="font-medium">{service.type}</p>
+            <p className="font-medium">{service.Type}</p>
           </div>
           <div className="card p-4">
             <span className="text-sm text-text-tertiary">Cluster IP</span>
-            <p className="font-mono">{service.cluster_ip || '-'}</p>
+            <p className="font-mono">{service.ClusterIP || '-'}</p>
           </div>
           <div className="card p-4">
             <span className="text-sm text-text-tertiary">External IPs</span>
-            <p className="font-mono">{service.external_ips?.join(', ') || '-'}</p>
+            <p className="font-mono">{service.ExternalIPs?.join(', ') || '-'}</p>
           </div>
         </div>
       </section>
@@ -47,13 +47,13 @@ function ServiceOverview({ service }: { service: Service }) {
               </tr>
             </thead>
             <tbody>
-              {service.ports?.map((port, index) => (
+              {service.Ports?.map((port, index) => (
                 <tr key={index} className="border-t border-border-subtle">
-                  <td className="px-4 py-2">{port.name || '-'}</td>
-                  <td className="px-4 py-2 font-mono">{port.port}</td>
-                  <td className="px-4 py-2 font-mono">{port.target_port}</td>
-                  <td className="px-4 py-2">{port.protocol}</td>
-                  <td className="px-4 py-2 font-mono">{port.node_port || '-'}</td>
+                  <td className="px-4 py-2">{port.Name || '-'}</td>
+                  <td className="px-4 py-2 font-mono">{port.Port}</td>
+                  <td className="px-4 py-2 font-mono">{port.TargetPort}</td>
+                  <td className="px-4 py-2">{port.Protocol}</td>
+                  <td className="px-4 py-2 font-mono">{port.NodePort || '-'}</td>
                 </tr>
               ))}
             </tbody>
@@ -134,13 +134,13 @@ export function ServiceDetailPage() {
   return (
     <ResourceDetailLayout
       kind="Service"
-      name={service.name}
-      namespace={service.namespace}
-      status={service.type}
-      statusType={getServiceType(service.type)}
+      name={service.Name}
+      namespace={service.Namespace}
+      status={service.Type}
+      statusType={getServiceType(service.Type)}
       breadcrumbs={[
         { label: 'Services', href: ROUTES.SERVICES },
-        { label: service.name },
+        { label: service.Name },
       ]}
       tabs={tabs}
     />

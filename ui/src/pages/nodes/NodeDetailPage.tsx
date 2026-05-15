@@ -7,7 +7,7 @@ import { Loader2, Tag, Server, Cpu, HardDrive } from 'lucide-react'
 import type { Node } from '@/api/schemas'
 
 function NodeOverview({ node }: { node: Node }) {
-  const labelEntries = Object.entries(node.labels || {})
+  const labelEntries = Object.entries(node.Labels || {})
 
   return (
     <div className="p-6 space-y-6 overflow-auto">
@@ -16,27 +16,27 @@ function NodeOverview({ node }: { node: Node }) {
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           <div className="card p-4">
             <span className="text-sm text-text-tertiary">OS</span>
-            <p className="font-medium">{node.os}</p>
+            <p className="font-medium">{node.OS}</p>
           </div>
           <div className="card p-4">
             <span className="text-sm text-text-tertiary">Architecture</span>
-            <p className="font-medium">{node.architecture}</p>
+            <p className="font-medium">{node.Architecture}</p>
           </div>
           <div className="card p-4">
             <span className="text-sm text-text-tertiary">Kernel</span>
-            <p className="font-medium text-sm">{node.kernel_version}</p>
+            <p className="font-medium text-sm">{node.KernelVersion}</p>
           </div>
           <div className="card p-4">
             <span className="text-sm text-text-tertiary">Container Runtime</span>
-            <p className="font-medium text-sm">{node.container_runtime}</p>
+            <p className="font-medium text-sm">{node.ContainerRuntime}</p>
           </div>
           <div className="card p-4">
             <span className="text-sm text-text-tertiary">Kubelet Version</span>
-            <p className="font-medium">{node.kubelet_version}</p>
+            <p className="font-medium">{node.KubeletVersion}</p>
           </div>
           <div className="card p-4">
             <span className="text-sm text-text-tertiary">Roles</span>
-            <p className="font-medium">{node.roles?.join(', ') || '-'}</p>
+            <p className="font-medium">{node.Roles?.join(', ') || '-'}</p>
           </div>
         </div>
       </section>
@@ -50,15 +50,15 @@ function NodeOverview({ node }: { node: Node }) {
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <div>
               <span className="text-sm text-text-tertiary">Internal IP</span>
-              <p className="font-mono">{node.internal_ip || '-'}</p>
+              <p className="font-mono">{node.InternalIP || '-'}</p>
             </div>
             <div>
               <span className="text-sm text-text-tertiary">External IP</span>
-              <p className="font-mono">{node.external_ip || '-'}</p>
+              <p className="font-mono">{node.ExternalIP || '-'}</p>
             </div>
             <div>
               <span className="text-sm text-text-tertiary">Pod CIDR</span>
-              <p className="font-mono">{node.pod_cidr || '-'}</p>
+              <p className="font-mono">{node.PodCIDR || '-'}</p>
             </div>
           </div>
         </div>
@@ -75,15 +75,15 @@ function NodeOverview({ node }: { node: Node }) {
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-text-tertiary">CPU</span>
-                <span>{node.capacity?.cpu || '-'}</span>
+                <span>{node.Capacity?.CPU || '-'}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-text-tertiary">Memory</span>
-                <span>{node.capacity?.memory || '-'}</span>
+                <span>{node.Capacity?.Memory || '-'}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-text-tertiary">Pods</span>
-                <span>{node.capacity?.pods || '-'}</span>
+                <span>{node.Capacity?.Pods || '-'}</span>
               </div>
             </div>
           </div>
@@ -92,22 +92,22 @@ function NodeOverview({ node }: { node: Node }) {
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-text-tertiary">CPU</span>
-                <span>{node.allocatable?.cpu || '-'}</span>
+                <span>{node.Allocatable?.CPU || '-'}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-text-tertiary">Memory</span>
-                <span>{node.allocatable?.memory || '-'}</span>
+                <span>{node.Allocatable?.Memory || '-'}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-text-tertiary">Pods</span>
-                <span>{node.allocatable?.pods || '-'}</span>
+                <span>{node.Allocatable?.Pods || '-'}</span>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {node.taints && node.taints.length > 0 && (
+      {node.Taints && node.Taints.length > 0 && (
         <section>
           <h3 className="text-sm font-medium text-text-secondary mb-4 flex items-center gap-2">
             <HardDrive className="h-4 w-4" />
@@ -123,13 +123,13 @@ function NodeOverview({ node }: { node: Node }) {
                 </tr>
               </thead>
               <tbody>
-                {node.taints.map((taint, index) => (
+                {node.Taints.map((taint, index) => (
                   <tr key={index} className="border-t border-border-subtle">
-                    <td className="px-4 py-2">{taint.key}</td>
-                    <td className="px-4 py-2">{taint.value || '-'}</td>
+                    <td className="px-4 py-2">{taint.Key}</td>
+                    <td className="px-4 py-2">{taint.Value || '-'}</td>
                     <td className="px-4 py-2">
-                      <StatusBadge status={taint.effect === 'NoSchedule' ? 'warning' : 'error'}>
-                        {taint.effect}
+                      <StatusBadge status={taint.Effect === 'NoSchedule' ? 'warning' : 'error'}>
+                        {taint.Effect}
                       </StatusBadge>
                     </td>
                   </tr>
@@ -152,25 +152,25 @@ function NodeOverview({ node }: { node: Node }) {
               </tr>
             </thead>
             <tbody>
-              {node.conditions?.map((condition, index) => (
+              {node.Conditions?.map((condition, index) => (
                 <tr key={index} className="border-t border-border-subtle">
-                  <td className="px-4 py-2">{condition.type}</td>
+                  <td className="px-4 py-2">{condition.Type}</td>
                   <td className="px-4 py-2">
                     <StatusBadge
                       status={
-                        condition.type === 'Ready'
-                          ? condition.status === 'True'
+                        condition.Type === 'Ready'
+                          ? condition.Status === 'True'
                             ? 'success'
                             : 'error'
-                          : condition.status === 'False'
+                          : condition.Status === 'False'
                             ? 'success'
                             : 'warning'
                       }
                     >
-                      {condition.status}
+                      {condition.Status}
                     </StatusBadge>
                   </td>
-                  <td className="px-4 py-2 text-text-secondary">{condition.reason || '-'}</td>
+                  <td className="px-4 py-2 text-text-secondary">{condition.Reason || '-'}</td>
                 </tr>
               ))}
             </tbody>
@@ -232,12 +232,12 @@ export function NodeDetailPage() {
   return (
     <ResourceDetailLayout
       kind="Node"
-      name={node.name}
-      status={node.status}
-      statusType={getNodeStatus(node.status)}
+      name={node.Name}
+      status={node.Status}
+      statusType={getNodeStatus(node.Status)}
       breadcrumbs={[
         { label: 'Nodes', href: ROUTES.NODES },
-        { label: node.name },
+        { label: node.Name },
       ]}
       tabs={tabs}
     />

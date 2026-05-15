@@ -19,13 +19,13 @@ export function ResourceEventsTab({ namespace, resourceName, resourceKind }: Res
   const { data, isLoading } = useEvents(namespace)
 
   const filteredEvents = useMemo(() => {
-    if (!data?.events) return []
-    return data.events.filter(
+    if (!data?.items) return []
+    return data.items.filter(
       (event) =>
-        event.involved_object.name === resourceName &&
-        event.involved_object.kind === resourceKind
+        event.InvolvedObject.Name === resourceName &&
+        event.InvolvedObject.Kind === resourceKind
     )
-  }, [data?.events, resourceName, resourceKind])
+  }, [data?.items, resourceName, resourceKind])
 
   if (isLoading) {
     return (
@@ -47,35 +47,35 @@ export function ResourceEventsTab({ namespace, resourceName, resourceKind }: Res
     <div className="space-y-2 p-4">
       {filteredEvents.map((event, index) => (
         <div
-          key={`${event.name}-${index}`}
+          key={`${event.Name}-${index}`}
           className={cn(
             'p-4 rounded-lg border',
-            event.type === 'Warning'
+            event.Type === 'Warning'
               ? 'bg-warning/5 border-warning/20'
               : 'bg-bg-tertiary border-border-subtle'
           )}
         >
           <div className="flex items-start gap-3">
-            {event.type === 'Warning' ? (
+            {event.Type === 'Warning' ? (
               <AlertTriangle className="h-5 w-5 text-warning shrink-0 mt-0.5" />
-            ) : event.type === 'Normal' ? (
+            ) : event.Type === 'Normal' ? (
               <Info className="h-5 w-5 text-text-secondary shrink-0 mt-0.5" />
             ) : (
               <AlertCircle className="h-5 w-5 text-error shrink-0 mt-0.5" />
             )}
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
-                <span className="font-medium text-text-primary">{event.reason}</span>
-                {event.count > 1 && (
+                <span className="font-medium text-text-primary">{event.Reason}</span>
+                {event.Count > 1 && (
                   <span className="text-xs text-text-tertiary bg-bg-tertiary px-2 py-0.5 rounded">
-                    x{event.count}
+                    x{event.Count}
                   </span>
                 )}
               </div>
-              <p className="text-sm text-text-secondary break-words">{event.message}</p>
+              <p className="text-sm text-text-secondary break-words">{event.Message}</p>
               <div className="flex items-center gap-4 mt-2 text-xs text-text-tertiary">
-                <span>Source: {event.source}</span>
-                <span>Last seen: {formatTimestamp(event.last_timestamp)}</span>
+                <span>Source: {event.Source}</span>
+                <span>Last seen: {formatTimestamp(event.LastTimestamp)}</span>
               </div>
             </div>
           </div>

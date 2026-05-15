@@ -1,23 +1,28 @@
 import { z } from 'zod'
 
 export const ContextSchema = z.object({
-  name: z.string(),
-  cluster: z.string(),
-  namespace: z.string(),
-  is_current: z.boolean(),
+  Name: z.string(),
+  Cluster: z.string(),
+  User: z.string(),
+  Namespace: z.string(),
+  IsCurrent: z.boolean(),
+  IsConnected: z.boolean(),
 })
 
-export const ContextsResponseSchema = z.object({
-  contexts: z.array(ContextSchema),
-  current: z.string(),
-})
+export const ContextsResponseSchema = z.array(ContextSchema)
 
 export const ConnectionSchema = z.object({
-  connected: z.boolean(),
+  ContextName: z.string(),
+  State: z.string(),
+  ConnectedAt: z.string(),
+  Namespace: z.string(),
+  ServerURL: z.string(),
+  Error: z.string(),
+})
+
+export const ConnectResponseSchema = z.object({
   context: z.string(),
-  namespace: z.string(),
-  cluster: z.string(),
-  server: z.string(),
+  status: z.string(),
 })
 
 export const NamespacesResponseSchema = z.object({
@@ -50,5 +55,6 @@ export const ClusterHealthSchema = z.object({
 export type Context = z.infer<typeof ContextSchema>
 export type ContextsResponse = z.infer<typeof ContextsResponseSchema>
 export type Connection = z.infer<typeof ConnectionSchema>
+export type ConnectResponse = z.infer<typeof ConnectResponseSchema>
 export type NamespacesResponse = z.infer<typeof NamespacesResponseSchema>
 export type ClusterHealth = z.infer<typeof ClusterHealthSchema>

@@ -6,7 +6,7 @@ import { Loader2, Tag, FileText } from 'lucide-react'
 import type { ConfigMap } from '@/api/schemas'
 
 function ConfigMapOverview({ configMap }: { configMap: ConfigMap }) {
-  const labelEntries = Object.entries(configMap.labels || {})
+  const labelEntries = Object.entries(configMap.Labels || {})
 
   return (
     <div className="p-6 space-y-6 overflow-auto">
@@ -16,11 +16,11 @@ function ConfigMapOverview({ configMap }: { configMap: ConfigMap }) {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <span className="text-sm text-text-tertiary">Data Keys</span>
-              <p className="font-medium">{Object.keys(configMap.data || {}).length}</p>
+              <p className="font-medium">{Object.keys(configMap.Data || {}).length}</p>
             </div>
             <div>
               <span className="text-sm text-text-tertiary">Created</span>
-              <p className="font-medium">{new Date(configMap.created_at).toLocaleString()}</p>
+              <p className="font-medium">{new Date(configMap.CreatedAt).toLocaleString()}</p>
             </div>
           </div>
         </div>
@@ -52,7 +52,7 @@ function ConfigMapOverview({ configMap }: { configMap: ConfigMap }) {
 }
 
 function ConfigMapDataTab({ configMap }: { configMap: ConfigMap }) {
-  const dataEntries = Object.entries(configMap.data || {})
+  const dataEntries = Object.entries(configMap.Data || {})
 
   if (dataEntries.length === 0) {
     return (
@@ -108,11 +108,11 @@ export function ConfigMapDetailPage() {
   return (
     <ResourceDetailLayout
       kind="ConfigMap"
-      name={configMap.name}
-      namespace={configMap.namespace}
+      name={configMap.Name}
+      namespace={configMap.Namespace}
       breadcrumbs={[
         { label: 'ConfigMaps', href: ROUTES.CONFIGMAPS },
-        { label: configMap.name },
+        { label: configMap.Name },
       ]}
       tabs={tabs}
     />

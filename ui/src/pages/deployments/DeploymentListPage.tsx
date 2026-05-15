@@ -11,7 +11,7 @@ export function DeploymentListPage() {
   const navigate = useNavigate()
 
   const handleRowClick = (deployment: Deployment) => {
-    navigate(deploymentDetailPath(deployment.namespace, deployment.name))
+    navigate(deploymentDetailPath(deployment.Namespace, deployment.Name))
   }
 
   return (
@@ -19,7 +19,7 @@ export function DeploymentListPage() {
       <PageHeader title="Deployments" />
       <main className="flex-1 overflow-hidden p-6">
         <ResourceTable
-          data={data?.deployments ?? []}
+          data={data?.items ?? []}
           columns={deploymentColumns}
           isLoading={isLoading}
           onRowClick={handleRowClick}

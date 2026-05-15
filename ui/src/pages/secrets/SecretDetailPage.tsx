@@ -8,7 +8,7 @@ import { Button } from '@/components/primitives'
 import type { Secret } from '@/api/schemas'
 
 function SecretOverview({ secret }: { secret: Secret }) {
-  const labelEntries = Object.entries(secret.labels || {})
+  const labelEntries = Object.entries(secret.Labels || {})
 
   return (
     <div className="p-6 space-y-6 overflow-auto">
@@ -18,15 +18,15 @@ function SecretOverview({ secret }: { secret: Secret }) {
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <div>
               <span className="text-sm text-text-tertiary">Type</span>
-              <p className="font-medium">{secret.type}</p>
+              <p className="font-medium">{secret.Type}</p>
             </div>
             <div>
               <span className="text-sm text-text-tertiary">Data Keys</span>
-              <p className="font-medium">{secret.data_keys?.length ?? 0}</p>
+              <p className="font-medium">{secret.DataKeys?.length ?? 0}</p>
             </div>
             <div>
               <span className="text-sm text-text-tertiary">Created</span>
-              <p className="font-medium">{new Date(secret.created_at).toLocaleString()}</p>
+              <p className="font-medium">{new Date(secret.CreatedAt).toLocaleString()}</p>
             </div>
           </div>
         </div>
@@ -64,7 +64,7 @@ function SecretDataTab({ secret }: { secret: Secret }) {
     setRevealed((prev) => ({ ...prev, [key]: !prev[key] }))
   }
 
-  if (!secret.data_keys?.length) {
+  if (!secret.DataKeys?.length) {
     return (
       <div className="flex items-center justify-center h-64 text-text-secondary">
         No data keys
@@ -74,7 +74,7 @@ function SecretDataTab({ secret }: { secret: Secret }) {
 
   return (
     <div className="p-6 space-y-4 overflow-auto">
-      {secret.data_keys.map((key) => (
+      {secret.DataKeys.map((key) => (
         <div key={key} className="card">
           <div className="flex items-center justify-between px-4 py-3 border-b border-border-subtle bg-bg-tertiary">
             <div className="flex items-center gap-2">
@@ -142,13 +142,13 @@ export function SecretDetailPage() {
   return (
     <ResourceDetailLayout
       kind="Secret"
-      name={secret.name}
-      namespace={secret.namespace}
-      status={secret.type}
+      name={secret.Name}
+      namespace={secret.Namespace}
+      status={secret.Type}
       statusType="neutral"
       breadcrumbs={[
         { label: 'Secrets', href: ROUTES.SECRETS },
-        { label: secret.name },
+        { label: secret.Name },
       ]}
       tabs={tabs}
     />

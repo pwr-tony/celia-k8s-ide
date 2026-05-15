@@ -9,7 +9,7 @@ export function NodeListPage() {
   const navigate = useNavigate()
 
   const handleRowClick = (node: Node) => {
-    navigate(nodeDetailPath(node.name))
+    navigate(nodeDetailPath(node.Name))
   }
 
   return (
@@ -17,7 +17,7 @@ export function NodeListPage() {
       <PageHeader title="Nodes" />
       <main className="flex-1 overflow-hidden p-6">
         <ResourceTable
-          data={data?.nodes ?? []}
+          data={data?.items ?? []}
           columns={nodeColumns}
           isLoading={isLoading}
           onRowClick={handleRowClick}

@@ -14,7 +14,7 @@ function formatDate(dateStr: string): string {
 export function PodOverview({ pod }: PodOverviewProps) {
   if (!pod) return null
 
-  const labelEntries = Object.entries(pod.labels || {})
+  const labelEntries = Object.entries(pod.Labels || {})
 
   return (
     <div className="p-6 space-y-6 overflow-auto">
@@ -26,8 +26,8 @@ export function PodOverview({ pod }: PodOverviewProps) {
               <Box className="h-4 w-4" />
               <span className="text-sm">Phase</span>
             </div>
-            <StatusBadge status={getPodStatus(pod.phase, pod.reason)}>
-              {pod.reason || pod.phase}
+            <StatusBadge status={getPodStatus(pod.Phase, pod.Status)}>
+              {pod.Status || pod.Phase}
             </StatusBadge>
           </div>
           <div className="card p-4">
@@ -35,21 +35,21 @@ export function PodOverview({ pod }: PodOverviewProps) {
               <Server className="h-4 w-4" />
               <span className="text-sm">Node</span>
             </div>
-            <span className="font-medium">{pod.node_name || '-'}</span>
+            <span className="font-medium">{pod.NodeName || '-'}</span>
           </div>
           <div className="card p-4">
             <div className="flex items-center gap-2 text-text-secondary mb-2">
               <RefreshCw className="h-4 w-4" />
               <span className="text-sm">Restarts</span>
             </div>
-            <span className="font-medium">{pod.restart_count}</span>
+            <span className="font-medium">{pod.RestartCount}</span>
           </div>
           <div className="card p-4">
             <div className="flex items-center gap-2 text-text-secondary mb-2">
               <Calendar className="h-4 w-4" />
               <span className="text-sm">Created</span>
             </div>
-            <span className="font-medium text-sm">{formatDate(pod.created_at)}</span>
+            <span className="font-medium text-sm">{formatDate(pod.CreatedAt)}</span>
           </div>
         </div>
       </section>
@@ -60,11 +60,11 @@ export function PodOverview({ pod }: PodOverviewProps) {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <span className="text-sm text-text-tertiary">Pod IP</span>
-              <p className="font-mono">{pod.ip || '-'}</p>
+              <p className="font-mono">{pod.PodIP || '-'}</p>
             </div>
             <div>
               <span className="text-sm text-text-tertiary">Node</span>
-              <p className="font-mono">{pod.node_name || '-'}</p>
+              <p className="font-mono">{pod.NodeName || '-'}</p>
             </div>
           </div>
         </div>
@@ -76,11 +76,11 @@ export function PodOverview({ pod }: PodOverviewProps) {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <span className="text-sm text-text-tertiary">Owner Kind</span>
-              <p>{pod.owner_kind || '-'}</p>
+              <p>{pod.OwnerKind || '-'}</p>
             </div>
             <div>
               <span className="text-sm text-text-tertiary">Owner Name</span>
-              <p>{pod.owner_name || '-'}</p>
+              <p>{pod.OwnerName || '-'}</p>
             </div>
           </div>
         </div>
@@ -120,15 +120,15 @@ export function PodOverview({ pod }: PodOverviewProps) {
               </tr>
             </thead>
             <tbody>
-              {pod.conditions?.map((condition, index) => (
+              {pod.Conditions?.map((condition, index) => (
                 <tr key={index} className="border-t border-border-subtle">
-                  <td className="px-4 py-2">{condition.type}</td>
+                  <td className="px-4 py-2">{condition.Type}</td>
                   <td className="px-4 py-2">
-                    <StatusBadge status={condition.status === 'True' ? 'success' : 'neutral'}>
-                      {condition.status}
+                    <StatusBadge status={condition.Status === 'True' ? 'success' : 'neutral'}>
+                      {condition.Status}
                     </StatusBadge>
                   </td>
-                  <td className="px-4 py-2 text-text-secondary">{condition.reason || '-'}</td>
+                  <td className="px-4 py-2 text-text-secondary">{condition.Reason || '-'}</td>
                 </tr>
               ))}
             </tbody>

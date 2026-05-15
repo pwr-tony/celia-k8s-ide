@@ -7,7 +7,7 @@ import { Loader2, Tag } from 'lucide-react'
 import type { Deployment } from '@/api/schemas'
 
 function DeploymentOverview({ deployment }: { deployment: Deployment }) {
-  const labelEntries = Object.entries(deployment.labels || {})
+  const labelEntries = Object.entries(deployment.Labels || {})
 
   return (
     <div className="p-6 space-y-6 overflow-auto">
@@ -16,19 +16,19 @@ function DeploymentOverview({ deployment }: { deployment: Deployment }) {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="card p-4">
             <span className="text-sm text-text-tertiary">Desired</span>
-            <p className="text-2xl font-bold">{deployment.replicas}</p>
+            <p className="text-2xl font-bold">{deployment.Replicas}</p>
           </div>
           <div className="card p-4">
             <span className="text-sm text-text-tertiary">Ready</span>
-            <p className="text-2xl font-bold">{deployment.ready_replicas}</p>
+            <p className="text-2xl font-bold">{deployment.ReadyReplicas}</p>
           </div>
           <div className="card p-4">
             <span className="text-sm text-text-tertiary">Up-to-date</span>
-            <p className="text-2xl font-bold">{deployment.updated_replicas}</p>
+            <p className="text-2xl font-bold">{deployment.UpdatedReplicas}</p>
           </div>
           <div className="card p-4">
             <span className="text-sm text-text-tertiary">Available</span>
-            <p className="text-2xl font-bold">{deployment.available_replicas}</p>
+            <p className="text-2xl font-bold">{deployment.AvailableReplicas}</p>
           </div>
         </div>
       </section>
@@ -36,7 +36,7 @@ function DeploymentOverview({ deployment }: { deployment: Deployment }) {
       <section>
         <h3 className="text-sm font-medium text-text-secondary mb-4">Strategy</h3>
         <div className="card p-4">
-          <span className="text-text-primary font-medium">{deployment.strategy}</span>
+          <span className="text-text-primary font-medium">{deployment.Strategy}</span>
         </div>
       </section>
 
@@ -75,16 +75,16 @@ function DeploymentOverview({ deployment }: { deployment: Deployment }) {
               </tr>
             </thead>
             <tbody>
-              {deployment.conditions?.map((condition, index) => (
+              {deployment.Conditions?.map((condition, index) => (
                 <tr key={index} className="border-t border-border-subtle">
-                  <td className="px-4 py-2">{condition.type}</td>
+                  <td className="px-4 py-2">{condition.Type}</td>
                   <td className="px-4 py-2">
-                    <StatusBadge status={condition.status === 'True' ? 'success' : 'neutral'}>
-                      {condition.status}
+                    <StatusBadge status={condition.Status === 'True' ? 'success' : 'neutral'}>
+                      {condition.Status}
                     </StatusBadge>
                   </td>
-                  <td className="px-4 py-2 text-text-secondary">{condition.reason || '-'}</td>
-                  <td className="px-4 py-2 text-text-secondary text-xs">{condition.message || '-'}</td>
+                  <td className="px-4 py-2 text-text-secondary">{condition.Reason || '-'}</td>
+                  <td className="px-4 py-2 text-text-secondary text-xs">{condition.Message || '-'}</td>
                 </tr>
               ))}
             </tbody>
@@ -124,13 +124,13 @@ export function DeploymentDetailPage() {
   return (
     <ResourceDetailLayout
       kind="Deployment"
-      name={deployment.name}
-      namespace={deployment.namespace}
-      status={`${deployment.ready_replicas}/${deployment.replicas}`}
-      statusType={getDeploymentStatus(deployment.ready_replicas, deployment.replicas)}
+      name={deployment.Name}
+      namespace={deployment.Namespace}
+      status={`${deployment.ReadyReplicas}/${deployment.Replicas}`}
+      statusType={getDeploymentStatus(deployment.ReadyReplicas, deployment.Replicas)}
       breadcrumbs={[
         { label: 'Deployments', href: ROUTES.DEPLOYMENTS },
-        { label: deployment.name },
+        { label: deployment.Name },
       ]}
       tabs={tabs}
     />

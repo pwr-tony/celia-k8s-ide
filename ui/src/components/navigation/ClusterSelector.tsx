@@ -1,4 +1,4 @@
-import { useContexts, useConnect } from '@/api/hooks'
+import { useContexts, useConnect, useConnection } from '@/api/hooks'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SimpleTooltip } from '@/components/primitives'
 import { useUIStore } from '@/stores/ui'
 import { Server } from 'lucide-react'
@@ -6,7 +6,11 @@ import { Server } from 'lucide-react'
 export function ClusterSelector() {
   const collapsed = useUIStore((s) => s.sidebarCollapsed)
   const { data: contexts, isLoading } = useContexts()
+  const { data: connection } = useConnection()
   const { mutate: connect, isPending } = useConnect()
+
+  const currentContext = connection?.State === 'connected' ? connection.ContextName : ''
+  const currentContextDisplay = currentContext || 'Select cluster'
 
   if (isLoading) {
     return (
@@ -18,7 +22,7 @@ export function ClusterSelector() {
 
   if (collapsed) {
     return (
-      <SimpleTooltip content={contexts?.current ?? 'Select cluster'} side="right">
+      <SimpleTooltip content={currentContextDisplay} side="right">
         <div className="flex items-center justify-center py-2">
           <Server className="h-4 w-4 text-text-secondary" />
         </div>
@@ -29,7 +33,7 @@ export function ClusterSelector() {
   return (
     <div className="px-1 py-2">
       <Select
-        value={contexts?.current ?? ''}
+        value={currentContext}
         onValueChange={(value) => connect(value)}
         disabled={isPending}
       >
@@ -37,9 +41,9 @@ export function ClusterSelector() {
           <SelectValue placeholder="Select cluster" />
         </SelectTrigger>
         <SelectContent>
-          {contexts?.contexts.map((ctx) => (
-            <SelectItem key={ctx.name} value={ctx.name}>
-              {ctx.name}
+          {contexts?.map((ctx) => (
+            <SelectItem key={ctx.Name} value={ctx.Name}>
+              {ctx.Name}
             </SelectItem>
           ))}
         </SelectContent>

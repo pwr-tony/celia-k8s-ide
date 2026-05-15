@@ -11,7 +11,7 @@ export function SecretListPage() {
   const navigate = useNavigate()
 
   const handleRowClick = (secret: Secret) => {
-    navigate(secretDetailPath(secret.namespace, secret.name))
+    navigate(secretDetailPath(secret.Namespace, secret.Name))
   }
 
   return (
@@ -19,7 +19,7 @@ export function SecretListPage() {
       <PageHeader title="Secrets" />
       <main className="flex-1 overflow-hidden p-6">
         <ResourceTable
-          data={data?.secrets ?? []}
+          data={data?.items ?? []}
           columns={secretColumns}
           isLoading={isLoading}
           onRowClick={handleRowClick}

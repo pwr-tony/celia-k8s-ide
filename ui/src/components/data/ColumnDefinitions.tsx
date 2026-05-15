@@ -18,32 +18,32 @@ function formatAge(dateStr: string): string {
 
 const podHelper = createColumnHelper<Pod>()
 const _podColumns = [
-  podHelper.accessor('name', {
+  podHelper.accessor('Name', {
     header: 'Name',
     cell: (info) => <span className="font-medium">{info.getValue()}</span>,
   }),
-  podHelper.accessor('namespace', {
+  podHelper.accessor('Namespace', {
     header: 'Namespace',
     cell: (info) => <span className="text-text-secondary">{info.getValue()}</span>,
   }),
-  podHelper.accessor((row) => ({ phase: row.phase, reason: row.reason }), {
+  podHelper.accessor((row) => ({ phase: row.Phase, status: row.Status }), {
     id: 'status',
     header: 'Status',
     cell: (info) => {
-      const { phase, reason } = info.getValue()
-      const displayStatus = reason || phase
+      const { phase, status } = info.getValue()
+      const displayStatus = status || phase
       return (
-        <StatusBadge status={getPodStatus(phase, reason)}>
+        <StatusBadge status={getPodStatus(phase, status)}>
           {displayStatus}
         </StatusBadge>
       )
     },
   }),
-  podHelper.accessor('node_name', {
+  podHelper.accessor('NodeName', {
     header: 'Node',
     cell: (info) => info.getValue() || '-',
   }),
-  podHelper.accessor('restart_count', {
+  podHelper.accessor('RestartCount', {
     header: 'Restarts',
     cell: (info) => {
       const count = info.getValue()
@@ -52,7 +52,7 @@ const _podColumns = [
       return <span className="text-text-secondary">{count}</span>
     },
   }),
-  podHelper.accessor('created_at', {
+  podHelper.accessor('CreatedAt', {
     header: 'Age',
     cell: (info) => formatAge(info.getValue()),
   }),
@@ -61,15 +61,15 @@ export const podColumns = _podColumns as typeof _podColumns
 
 const deploymentHelper = createColumnHelper<Deployment>()
 const _deploymentColumns = [
-  deploymentHelper.accessor('name', {
+  deploymentHelper.accessor('Name', {
     header: 'Name',
     cell: (info) => <span className="font-medium">{info.getValue()}</span>,
   }),
-  deploymentHelper.accessor('namespace', {
+  deploymentHelper.accessor('Namespace', {
     header: 'Namespace',
     cell: (info) => <span className="text-text-secondary">{info.getValue()}</span>,
   }),
-  deploymentHelper.accessor((row) => ({ ready: row.ready_replicas, desired: row.replicas }), {
+  deploymentHelper.accessor((row) => ({ ready: row.ReadyReplicas, desired: row.Replicas }), {
     id: 'ready',
     header: 'Ready',
     cell: (info) => {
@@ -81,15 +81,15 @@ const _deploymentColumns = [
       )
     },
   }),
-  deploymentHelper.accessor('updated_replicas', {
+  deploymentHelper.accessor('UpdatedReplicas', {
     header: 'Up-to-date',
     cell: (info) => info.getValue(),
   }),
-  deploymentHelper.accessor('available_replicas', {
+  deploymentHelper.accessor('AvailableReplicas', {
     header: 'Available',
     cell: (info) => info.getValue(),
   }),
-  deploymentHelper.accessor('created_at', {
+  deploymentHelper.accessor('CreatedAt', {
     header: 'Age',
     cell: (info) => formatAge(info.getValue()),
   }),
@@ -98,15 +98,15 @@ export const deploymentColumns = _deploymentColumns as typeof _deploymentColumns
 
 const serviceHelper = createColumnHelper<Service>()
 const _serviceColumns = [
-  serviceHelper.accessor('name', {
+  serviceHelper.accessor('Name', {
     header: 'Name',
     cell: (info) => <span className="font-medium">{info.getValue()}</span>,
   }),
-  serviceHelper.accessor('namespace', {
+  serviceHelper.accessor('Namespace', {
     header: 'Namespace',
     cell: (info) => <span className="text-text-secondary">{info.getValue()}</span>,
   }),
-  serviceHelper.accessor('type', {
+  serviceHelper.accessor('Type', {
     header: 'Type',
     cell: (info) => (
       <StatusBadge status={getServiceType(info.getValue())}>
@@ -114,23 +114,23 @@ const _serviceColumns = [
       </StatusBadge>
     ),
   }),
-  serviceHelper.accessor('cluster_ip', {
+  serviceHelper.accessor('ClusterIP', {
     header: 'Cluster IP',
     cell: (info) => <span className="font-mono text-sm">{info.getValue()}</span>,
   }),
-  serviceHelper.accessor('ports', {
+  serviceHelper.accessor('Ports', {
     header: 'Ports',
     cell: (info) => {
       const ports = info.getValue()
       if (!ports?.length) return '-'
       return (
         <span className="font-mono text-sm">
-          {ports.map((p) => `${p.port}/${p.protocol}`).join(', ')}
+          {ports.map((p) => `${p.Port}/${p.Protocol}`).join(', ')}
         </span>
       )
     },
   }),
-  serviceHelper.accessor('created_at', {
+  serviceHelper.accessor('CreatedAt', {
     header: 'Age',
     cell: (info) => formatAge(info.getValue()),
   }),
@@ -139,15 +139,15 @@ export const serviceColumns = _serviceColumns as typeof _serviceColumns
 
 const configMapHelper = createColumnHelper<ConfigMap>()
 const _configMapColumns = [
-  configMapHelper.accessor('name', {
+  configMapHelper.accessor('Name', {
     header: 'Name',
     cell: (info) => <span className="font-medium">{info.getValue()}</span>,
   }),
-  configMapHelper.accessor('namespace', {
+  configMapHelper.accessor('Namespace', {
     header: 'Namespace',
     cell: (info) => <span className="text-text-secondary">{info.getValue()}</span>,
   }),
-  configMapHelper.accessor('data', {
+  configMapHelper.accessor('Data', {
     header: 'Data Keys',
     cell: (info) => {
       const data = info.getValue()
@@ -155,7 +155,7 @@ const _configMapColumns = [
       return keys.length
     },
   }),
-  configMapHelper.accessor('created_at', {
+  configMapHelper.accessor('CreatedAt', {
     header: 'Age',
     cell: (info) => formatAge(info.getValue()),
   }),
@@ -164,23 +164,23 @@ export const configMapColumns = _configMapColumns as typeof _configMapColumns
 
 const secretHelper = createColumnHelper<Secret>()
 const _secretColumns = [
-  secretHelper.accessor('name', {
+  secretHelper.accessor('Name', {
     header: 'Name',
     cell: (info) => <span className="font-medium">{info.getValue()}</span>,
   }),
-  secretHelper.accessor('namespace', {
+  secretHelper.accessor('Namespace', {
     header: 'Namespace',
     cell: (info) => <span className="text-text-secondary">{info.getValue()}</span>,
   }),
-  secretHelper.accessor('type', {
+  secretHelper.accessor('Type', {
     header: 'Type',
     cell: (info) => <span className="text-text-secondary">{info.getValue()}</span>,
   }),
-  secretHelper.accessor('data_keys', {
+  secretHelper.accessor('DataKeys', {
     header: 'Data Keys',
     cell: (info) => info.getValue()?.length ?? 0,
   }),
-  secretHelper.accessor('created_at', {
+  secretHelper.accessor('CreatedAt', {
     header: 'Age',
     cell: (info) => formatAge(info.getValue()),
   }),
@@ -189,11 +189,11 @@ export const secretColumns = _secretColumns as typeof _secretColumns
 
 const nodeHelper = createColumnHelper<Node>()
 const _nodeColumns = [
-  nodeHelper.accessor('name', {
+  nodeHelper.accessor('Name', {
     header: 'Name',
     cell: (info) => <span className="font-medium">{info.getValue()}</span>,
   }),
-  nodeHelper.accessor('status', {
+  nodeHelper.accessor('Status', {
     header: 'Status',
     cell: (info) => (
       <StatusBadge status={getNodeStatus(info.getValue())}>
@@ -201,15 +201,15 @@ const _nodeColumns = [
       </StatusBadge>
     ),
   }),
-  nodeHelper.accessor('roles', {
+  nodeHelper.accessor('Roles', {
     header: 'Roles',
     cell: (info) => info.getValue()?.join(', ') || '-',
   }),
-  nodeHelper.accessor('version', {
+  nodeHelper.accessor('Version', {
     header: 'Version',
     cell: (info) => <span className="font-mono text-sm">{info.getValue()}</span>,
   }),
-  nodeHelper.accessor('created_at', {
+  nodeHelper.accessor('CreatedAt', {
     header: 'Age',
     cell: (info) => formatAge(info.getValue()),
   }),

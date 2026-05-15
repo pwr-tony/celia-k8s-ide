@@ -11,7 +11,7 @@ export function ConfigMapListPage() {
   const navigate = useNavigate()
 
   const handleRowClick = (configMap: ConfigMap) => {
-    navigate(configMapDetailPath(configMap.namespace, configMap.name))
+    navigate(configMapDetailPath(configMap.Namespace, configMap.Name))
   }
 
   return (
@@ -19,7 +19,7 @@ export function ConfigMapListPage() {
       <PageHeader title="ConfigMaps" />
       <main className="flex-1 overflow-hidden p-6">
         <ResourceTable
-          data={data?.configmaps ?? []}
+          data={data?.items ?? []}
           columns={configMapColumns}
           isLoading={isLoading}
           onRowClick={handleRowClick}

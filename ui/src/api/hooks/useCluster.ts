@@ -3,14 +3,15 @@ import { get, post } from '../client'
 import {
   ContextsResponseSchema,
   ConnectionSchema,
+  ConnectResponseSchema,
   NamespacesResponseSchema,
   ClusterHealthSchema,
   type ContextsResponse,
   type Connection,
+  type ConnectResponse,
   type NamespacesResponse,
   type ClusterHealth,
 } from '../schemas'
-import { z } from 'zod'
 
 export const clusterKeys = {
   all: ['cluster'] as const,
@@ -55,7 +56,7 @@ export function useConnect() {
 
   return useMutation({
     mutationFn: (contextName: string) =>
-      post<Connection>('/clusters/connect', { context: contextName }, ConnectionSchema),
+      post<ConnectResponse>('/clusters/connect', { context_name: contextName }, ConnectResponseSchema),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: clusterKeys.all })
     },
@@ -66,7 +67,7 @@ export function useDisconnect() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: () => post('/clusters/disconnect', {}, z.object({ message: z.string() })),
+    mutationFn: () => post<ConnectResponse>('/clusters/disconnect', {}, ConnectResponseSchema),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: clusterKeys.all })
     },

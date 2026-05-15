@@ -115,7 +115,7 @@ export function useResourceYAML(kind: string, namespace: string, name: string) {
 export function usePod(namespace: string, name: string) {
   const { data, ...rest } = usePods(namespace)
   return {
-    data: data?.pods.find((p) => p.name === name),
+    data: data?.items.find((p) => p.Name === name),
     ...rest,
   }
 }
@@ -123,7 +123,7 @@ export function usePod(namespace: string, name: string) {
 export function useDeployment(namespace: string, name: string) {
   const { data, ...rest } = useDeployments(namespace)
   return {
-    data: data?.deployments.find((d) => d.name === name),
+    data: data?.items.find((d) => d.Name === name),
     ...rest,
   }
 }
@@ -131,7 +131,7 @@ export function useDeployment(namespace: string, name: string) {
 export function useService(namespace: string, name: string) {
   const { data, ...rest } = useServices(namespace)
   return {
-    data: data?.services.find((s) => s.name === name),
+    data: data?.items.find((s) => s.Name === name),
     ...rest,
   }
 }
@@ -139,7 +139,7 @@ export function useService(namespace: string, name: string) {
 export function useConfigMap(namespace: string, name: string) {
   const { data, ...rest } = useConfigMaps(namespace)
   return {
-    data: data?.configmaps.find((c) => c.name === name),
+    data: data?.items.find((c) => c.Name === name),
     ...rest,
   }
 }
@@ -147,7 +147,7 @@ export function useConfigMap(namespace: string, name: string) {
 export function useSecret(namespace: string, name: string) {
   const { data, ...rest } = useSecrets(namespace)
   return {
-    data: data?.secrets.find((s) => s.name === name),
+    data: data?.items.find((s) => s.Name === name),
     ...rest,
   }
 }
@@ -155,7 +155,7 @@ export function useSecret(namespace: string, name: string) {
 export function useNode(name: string) {
   const { data, ...rest } = useNodes()
   return {
-    data: data?.nodes.find((n) => n.name === name),
+    data: data?.items.find((n) => n.Name === name),
     ...rest,
   }
 }

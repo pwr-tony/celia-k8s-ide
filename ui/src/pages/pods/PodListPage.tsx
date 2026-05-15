@@ -11,7 +11,7 @@ export function PodListPage() {
   const navigate = useNavigate()
 
   const handleRowClick = (pod: Pod) => {
-    navigate(podDetailPath(pod.namespace, pod.name))
+    navigate(podDetailPath(pod.Namespace, pod.Name))
   }
 
   return (
@@ -19,7 +19,7 @@ export function PodListPage() {
       <PageHeader title="Pods" />
       <main className="flex-1 overflow-hidden p-6">
         <ResourceTable
-          data={data?.pods ?? []}
+          data={data?.items ?? []}
           columns={podColumns}
           isLoading={isLoading}
           onRowClick={handleRowClick}

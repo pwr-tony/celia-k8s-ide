@@ -30,7 +30,7 @@ function ConnectionStatus() {
     )
   }
 
-  if (!connection?.connected) {
+  if (connection?.State !== 'connected') {
     return (
       <div className="flex items-center gap-2 text-warning">
         <AlertCircle className="h-4 w-4" />
@@ -42,7 +42,7 @@ function ConnectionStatus() {
   return (
     <div className="flex items-center gap-2 text-success">
       <CheckCircle2 className="h-4 w-4" />
-      <span className="font-medium">{connection.context}</span>
+      <span className="font-medium">{connection.ContextName}</span>
     </div>
   )
 }

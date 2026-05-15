@@ -31,19 +31,19 @@ export function PodDetailPage() {
     { id: 'containers', label: 'Containers', content: <PodContainersTab pod={pod} /> },
     { id: 'yaml', label: 'YAML', content: <ResourceYAMLTab kind="Pod" namespace={namespace!} name={name!} /> },
     { id: 'events', label: 'Events', content: <ResourceEventsTab namespace={namespace!} resourceName={name!} resourceKind="Pod" /> },
-    { id: 'logs', label: 'Logs', content: <PodLogsTab namespace={namespace!} podName={name!} containers={pod.containers} /> },
+    { id: 'logs', label: 'Logs', content: <PodLogsTab namespace={namespace!} podName={name!} containers={pod.Containers} /> },
   ]
 
   return (
     <ResourceDetailLayout
       kind="Pod"
-      name={pod.name}
-      namespace={pod.namespace}
-      status={pod.reason || pod.phase}
-      statusType={getPodStatus(pod.phase, pod.reason)}
+      name={pod.Name}
+      namespace={pod.Namespace}
+      status={pod.Status || pod.Phase}
+      statusType={getPodStatus(pod.Phase, pod.Status)}
       breadcrumbs={[
         { label: 'Pods', href: ROUTES.PODS },
-        { label: pod.name },
+        { label: pod.Name },
       ]}
       tabs={tabs}
     />
