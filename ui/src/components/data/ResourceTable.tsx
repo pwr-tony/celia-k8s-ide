@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo } from 'react'
+import { useState, useRef, useMemo, useCallback, useEffect } from 'react'
 import {
   useReactTable,
   getCoreRowModel,
@@ -11,6 +11,7 @@ import {
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { cn } from '@/lib/utils'
 import { Search, ArrowUpDown, ArrowUp, ArrowDown, Loader2 } from 'lucide-react'
+import { useTableKeyboardNav } from '@/hooks'
 
 interface ResourceTableProps<T> {
   data: T[]
@@ -33,6 +34,7 @@ export function ResourceTable<T>({
   const [sorting, setSorting] = useState<SortingState>([])
   const [globalFilter, setGlobalFilter] = useState('')
   const tableContainerRef = useRef<HTMLDivElement>(null)
+  const searchInputRef = useRef<HTMLInputElement>(null)
 
   const table = useReactTable({
     data,
@@ -61,6 +63,40 @@ export function ResourceTable<T>({
   const paddingBottom =
     virtualRows.length > 0 ? totalSize - (virtualRows[virtualRows.length - 1]?.end ?? 0) : 0
 
+  const scrollToIndex = useCallback(
+    (index: number) => {
+      rowVirtualizer.scrollToIndex(index, { align: 'auto' })
+    },
+    [rowVirtualizer]
+  )
+
+  const handleRowSelect = useCallback(
+    (item: T) => {
+      onRowClick?.(item)
+    },
+    [onRowClick]
+  )
+
+  const {
+    focusedIndex,
+    setFocusedIndex,
+    handleKeyDown,
+    isFocused,
+    setIsFocused,
+  } = useTableKeyboardNav({
+    items: rows.map((row) => row.original),
+    onSelect: handleRowSelect,
+    tableRef: tableContainerRef,
+    searchInputRef,
+    scrollToIndex,
+  })
+
+  useEffect(() => {
+    if (focusedIndex >= 0 && isFocused) {
+      scrollToIndex(focusedIndex)
+    }
+  }, [focusedIndex, isFocused, scrollToIndex])
+
   const columnSizingInfo = table.getState().columnSizingInfo
   const columnSizeVars = useMemo(() => {
     const headers = table.getFlatHeaders()
@@ -87,6 +123,7 @@ export function ResourceTable<T>({
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-tertiary" />
           <input
+            ref={searchInputRef}
             type="text"
             value={globalFilter}
             onChange={(e) => setGlobalFilter(e.target.value)}
@@ -101,7 +138,18 @@ export function ResourceTable<T>({
 
       <div
         ref={tableContainerRef}
-        className="flex-1 overflow-auto border border-border-subtle rounded-lg bg-bg-secondary"
+        tabIndex={0}
+        onFocus={() => setIsFocused(true)}
+        onBlur={(e) => {
+          if (!e.currentTarget.contains(e.relatedTarget)) {
+            setIsFocused(false)
+          }
+        }}
+        onKeyDown={handleKeyDown}
+        className={cn(
+          'flex-1 overflow-auto border rounded-lg bg-bg-secondary focus:outline-none',
+          isFocused ? 'border-accent-primary' : 'border-border-subtle'
+        )}
         style={columnSizeVars as React.CSSProperties}
       >
         <table className="w-full border-collapse">
@@ -149,13 +197,19 @@ export function ResourceTable<T>({
             )}
             {virtualRows.map((virtualRow) => {
               const row = rows[virtualRow.index]
+              const rowIndex = virtualRow.index
+              const isRowFocused = isFocused && focusedIndex === rowIndex
               return (
                 <tr
                   key={row.id}
-                  onClick={() => onRowClick?.(row.original)}
+                  onClick={() => {
+                    setFocusedIndex(rowIndex)
+                    onRowClick?.(row.original)
+                  }}
                   className={cn(
                     'border-b border-border-subtle last:border-b-0 transition-colors',
-                    onRowClick && 'cursor-pointer hover:bg-bg-hover'
+                    onRowClick && 'cursor-pointer hover:bg-bg-hover',
+                    isRowFocused && 'bg-bg-hover ring-1 ring-inset ring-accent-primary'
                   )}
                   style={{ height: `${virtualRow.size}px` }}
                 >

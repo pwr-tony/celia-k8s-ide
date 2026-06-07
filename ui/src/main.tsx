@@ -1,6 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { KeyboardProvider } from '@/lib/keyboard'
 import { AppRouter } from './router'
 import '@/styles/globals.css'
 
@@ -17,7 +18,9 @@ const queryClient = new QueryClient({
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <AppRouter />
+      <KeyboardProvider>
+        <AppRouter />
+      </KeyboardProvider>
     </QueryClientProvider>
   </StrictMode>
 )

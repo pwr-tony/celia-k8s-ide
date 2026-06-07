@@ -204,6 +204,12 @@ export const ResourceYAMLSchema = z.object({
   yaml: z.string(),
 })
 
+export const UpdateResourceResponseSchema = z.object({
+  message: z.string(),
+})
+
+export type UpdateResourceResponse = z.infer<typeof UpdateResourceResponseSchema>
+
 export const ConfigMapSchema = z.object({
   Name: z.string(),
   Namespace: z.string(),

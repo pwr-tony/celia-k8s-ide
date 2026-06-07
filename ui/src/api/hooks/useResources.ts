@@ -1,5 +1,5 @@
-import { useQuery } from '@tanstack/react-query'
-import { get } from '../client'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { get, put } from '../client'
 import {
   PodsResponseSchema,
   DeploymentsResponseSchema,
@@ -9,6 +9,7 @@ import {
   ResourceYAMLSchema,
   ConfigMapsResponseSchema,
   SecretsResponseSchema,
+  UpdateResourceResponseSchema,
   type PodsResponse,
   type DeploymentsResponse,
   type ServicesResponse,
@@ -16,6 +17,7 @@ import {
   type EventsResponse,
   type ConfigMapsResponse,
   type SecretsResponse,
+  type UpdateResourceResponse,
 } from '../schemas'
 
 export const resourceKeys = {
@@ -158,4 +160,33 @@ export function useNode(name: string) {
     data: data?.items.find((n) => n.Name === name),
     ...rest,
   }
+}
+
+interface UpdateResourceParams {
+  kind: string
+  namespace: string
+  name: string
+  yaml: string
+}
+
+export function useUpdateResource() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({ kind, namespace, name, yaml }: UpdateResourceParams) => {
+      return put<UpdateResourceResponse>(
+        `/resources/${kind}/${namespace}/${name}`,
+        { yaml },
+        UpdateResourceResponseSchema
+      )
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: resourceKeys.yaml(variables.kind, variables.namespace, variables.name),
+      })
+      queryClient.invalidateQueries({
+        queryKey: resourceKeys.all,
+      })
+    },
+  })
 }
