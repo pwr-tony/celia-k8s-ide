@@ -1,0 +1,45 @@
+# Go
+build/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+coverage.out
+coverage.html
+vendor/
+
+# Node
+node_modules/
+.pnpm-store/
+
+# Vite
+ui/dist/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Tauri
+desktop/src-tauri/binaries/
+desktop/src-tauri/target/
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Air (hot reload)
+tmp/

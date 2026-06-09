@@ -1,6 +1,7 @@
 import { z } from 'zod'
+import { getApiBase } from '@/lib/environment'
 
-const API_BASE = '/api/v1'
+const API_BASE = getApiBase()
 
 export class ApiError extends Error {
   status: number

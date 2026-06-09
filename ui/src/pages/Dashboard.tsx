@@ -1,8 +1,9 @@
 import { useConnection, useClusterHealth } from '@/api/hooks'
 import { useProblems } from '@/api/hooks'
 import { Button } from '@/components/primitives'
-import { AlertCircle, CheckCircle2, Loader2, Server, Box, AlertTriangle } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { StatCard } from '@/components/data/StatCard'
+import { ProblemCard } from '@/components/data/ProblemCard'
+import { AlertCircle, CheckCircle2, Loader2, Server, Box, AlertTriangle, Clock } from 'lucide-react'
 import { useNavigate } from 'react-router'
 import { ROUTES } from '@/router/routes'
 
@@ -28,9 +29,12 @@ function ConnectionStatus() {
   }
 
   return (
-    <div className="flex items-center gap-2 text-success">
-      <CheckCircle2 className="h-4 w-4" />
-      <span className="font-medium">{connection.ContextName}</span>
+    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-success/10 border border-success/20">
+      <span className="relative flex h-2 w-2">
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
+        <span className="relative inline-flex rounded-full h-2 w-2 bg-success"></span>
+      </span>
+      <span className="text-sm font-medium text-success">{connection.ContextName}</span>
     </div>
   )
 }
@@ -42,7 +46,7 @@ function ClusterStats() {
     return (
       <div className="grid grid-cols-4 gap-4">
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="h-24 animate-pulse bg-bg-tertiary rounded-lg" />
+          <div key={i} className="h-32 animate-pulse bg-bg-tertiary rounded-lg" />
         ))}
       </div>
     )
@@ -50,70 +54,51 @@ function ClusterStats() {
 
   if (!health) return null
 
-  const stats = [
-    {
-      label: 'Nodes',
-      value: health.nodes.total,
-      detail: `${health.nodes.ready} ready`,
-      icon: Server,
-      status: health.nodes.not_ready > 0 ? 'warning' : 'success',
-    },
-    {
-      label: 'Pods',
-      value: health.pods.total,
-      detail: `${health.pods.running} running`,
-      icon: Box,
-      status: health.pods.failed > 0 ? 'error' : 'success',
-    },
-    {
-      label: 'Pending',
-      value: health.pods.pending,
-      detail: 'pods waiting',
-      icon: Loader2,
-      status: health.pods.pending > 10 ? 'warning' : 'success',
-    },
-    {
-      label: 'Failed',
-      value: health.pods.failed,
-      detail: 'pods failed',
-      icon: AlertTriangle,
-      status: health.pods.failed > 0 ? 'error' : 'success',
-    },
-  ]
-
   return (
     <div className="grid grid-cols-4 gap-4">
-      {stats.map((stat) => (
-        <div key={stat.label} className="card p-4">
-          <div className="flex items-center justify-between">
-            <span className="text-text-secondary text-sm">{stat.label}</span>
-            <stat.icon
-              className={cn(
-                'h-5 w-5',
-                stat.status === 'success' && 'text-success',
-                stat.status === 'warning' && 'text-warning',
-                stat.status === 'error' && 'text-error'
-              )}
-            />
-          </div>
-          <div className="mt-2">
-            <span className="text-2xl font-bold">{stat.value}</span>
-            <span className="text-text-tertiary text-sm ml-2">{stat.detail}</span>
-          </div>
-        </div>
-      ))}
+      <StatCard
+        label="Nodes"
+        value={health.nodes.total}
+        detail="total"
+        icon={Server}
+        status={health.nodes.not_ready > 0 ? 'warning' : 'success'}
+        progress={{ current: health.nodes.ready, total: health.nodes.total }}
+      />
+      <StatCard
+        label="Pods"
+        value={health.pods.total}
+        detail="total"
+        icon={Box}
+        status={health.pods.failed > 0 ? 'error' : health.pods.pending > 0 ? 'warning' : 'success'}
+        progress={{ current: health.pods.running, total: health.pods.total }}
+      />
+      <StatCard
+        label="Pending"
+        value={health.pods.pending}
+        detail="pods waiting"
+        icon={Clock}
+        status={health.pods.pending > 10 ? 'warning' : health.pods.pending > 0 ? 'neutral' : 'success'}
+      />
+      <StatCard
+        label="Failed"
+        value={health.pods.failed}
+        detail="pods failed"
+        icon={AlertTriangle}
+        status={health.pods.failed > 0 ? 'error' : 'success'}
+      />
     </div>
   )
 }
 
 function ProblemsList() {
   const { data: problems, isLoading } = useProblems()
+  const navigate = useNavigate()
 
   if (isLoading) {
     return (
-      <div className="space-y-2">
+      <div className="space-y-3">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="h-16 animate-pulse bg-bg-tertiary rounded-lg" />
+          <div key={i} className="h-20 animate-pulse bg-bg-tertiary rounded-lg" />
         ))}
       </div>
     )
@@ -121,40 +106,27 @@ function ProblemsList() {
 
   if (!problems?.problems.length) {
     return (
-      <div className="card p-8 text-center text-text-secondary">
+      <div className="rounded-lg border border-success/20 bg-success/5 p-8 text-center">
         <CheckCircle2 className="h-12 w-12 mx-auto mb-4 text-success" />
-        <p>No problems detected</p>
+        <p className="text-text-secondary font-medium">No problems detected</p>
+        <p className="text-text-tertiary text-sm mt-1">Your cluster is healthy</p>
       </div>
     )
   }
 
-  const severityColors: Record<number, string> = {
-    4: 'border-l-severity-critical',
-    3: 'border-l-severity-high',
-    2: 'border-l-severity-medium',
-    1: 'border-l-severity-low',
-  }
-
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       {problems.problems.slice(0, 10).map((problem) => (
-        <div
+        <ProblemCard
           key={problem.id}
-          className={cn(
-            'card p-4 border-l-4 cursor-pointer hover:bg-bg-hover transition-colors',
-            severityColors[problem.severity]
-          )}
-        >
-          <div className="flex items-start justify-between">
-            <div>
-              <div className="font-medium">{problem.title}</div>
-              <div className="text-sm text-text-secondary mt-1">
-                {problem.namespace}/{problem.resource_name}
-              </div>
-            </div>
-            <span className="badge bg-bg-tertiary text-text-secondary">{problem.type}</span>
-          </div>
-        </div>
+          id={problem.id}
+          title={problem.title}
+          type={problem.type}
+          namespace={problem.namespace}
+          resourceName={problem.resource_name}
+          severity={problem.severity as 1 | 2 | 3 | 4}
+          onClick={() => navigate(`${ROUTES.PODS}?highlight=${problem.resource_name}`)}
+        />
       ))}
     </div>
   )
@@ -167,7 +139,10 @@ export function Dashboard() {
     <>
       <header className="shrink-0 border-b border-border-subtle bg-bg-secondary">
         <div className="flex items-center justify-between px-6 py-4">
-          <h1 className="text-lg font-semibold text-text-primary">Dashboard</h1>
+          <div>
+            <h1 className="text-xl font-semibold text-text-primary">Dashboard</h1>
+            <p className="text-sm text-text-tertiary mt-0.5">Cluster overview and health status</p>
+          </div>
           <ConnectionStatus />
         </div>
       </header>
@@ -178,7 +153,10 @@ export function Dashboard() {
         <div className="grid grid-cols-3 gap-6">
           <div className="col-span-2">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold">Problems</h2>
+              <div>
+                <h2 className="text-lg font-semibold">Active Problems</h2>
+                <p className="text-sm text-text-tertiary">Issues requiring attention</p>
+              </div>
               <Button variant="ghost" size="sm" onClick={() => navigate(ROUTES.PODS)}>
                 View all
               </Button>
@@ -187,8 +165,11 @@ export function Dashboard() {
           </div>
 
           <div>
-            <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
-            <div className="card p-4 space-y-2">
+            <div className="mb-4">
+              <h2 className="text-lg font-semibold">Quick Actions</h2>
+              <p className="text-sm text-text-tertiary">Common operations</p>
+            </div>
+            <div className="rounded-lg border border-border-subtle bg-bg-secondary p-4 space-y-2">
               <Button variant="secondary" className="w-full justify-start">
                 Scale Deployment
               </Button>

@@ -174,13 +174,13 @@ export class WebSocketManager {
   }
 }
 
+import { getWsUrl } from '@/lib/environment'
+
 let wsInstance: WebSocketManager | null = null
 
 export function getWebSocket(): WebSocketManager {
   if (!wsInstance) {
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-    const host = window.location.host
-    wsInstance = new WebSocketManager(`${protocol}//${host}/api/v1/ws`)
+    wsInstance = new WebSocketManager(getWsUrl())
   }
   return wsInstance
 }
