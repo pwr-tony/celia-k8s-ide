@@ -9,6 +9,7 @@ import type { Secret } from '@/api/schemas'
 
 function SecretOverview({ secret }: { secret: Secret }) {
   const labelEntries = Object.entries(secret.Labels || {})
+  const dataKeys = Object.keys(secret.Data || {})
 
   return (
     <div className="p-6 space-y-6 overflow-auto">
@@ -22,7 +23,7 @@ function SecretOverview({ secret }: { secret: Secret }) {
             </div>
             <div>
               <span className="text-sm text-text-tertiary">Data Keys</span>
-              <p className="font-medium">{secret.DataKeys?.length ?? 0}</p>
+              <p className="font-medium">{dataKeys.length}</p>
             </div>
             <div>
               <span className="text-sm text-text-tertiary">Created</span>
@@ -59,12 +60,13 @@ function SecretOverview({ secret }: { secret: Secret }) {
 
 function SecretDataTab({ secret }: { secret: Secret }) {
   const [revealed, setRevealed] = useState<Record<string, boolean>>({})
+  const dataEntries = Object.entries(secret.Data || {})
 
   const toggleReveal = (key: string) => {
     setRevealed((prev) => ({ ...prev, [key]: !prev[key] }))
   }
 
-  if (!secret.DataKeys?.length) {
+  if (dataEntries.length === 0) {
     return (
       <div className="flex items-center justify-center h-64 text-text-secondary">
         No data keys
@@ -74,12 +76,13 @@ function SecretDataTab({ secret }: { secret: Secret }) {
 
   return (
     <div className="p-6 space-y-4 overflow-auto">
-      {secret.DataKeys.map((key) => (
+      {dataEntries.map(([key, dataValue]) => (
         <div key={key} className="card">
           <div className="flex items-center justify-between px-4 py-3 border-b border-border-subtle bg-bg-tertiary">
             <div className="flex items-center gap-2">
               <Lock className="h-4 w-4 text-text-secondary" />
               <span className="font-medium">{key}</span>
+              <span className="text-xs text-text-tertiary">({dataValue.Size} bytes)</span>
             </div>
             <Button variant="ghost" size="sm" onClick={() => toggleReveal(key)}>
               {revealed[key] ? (
@@ -97,13 +100,18 @@ function SecretDataTab({ secret }: { secret: Secret }) {
           </div>
           <div className="p-4">
             {revealed[key] ? (
-              <p className="text-warning text-sm">
-                Secret values are not available in list view for security reasons.
-                Check the YAML tab for the base64-encoded value.
-              </p>
+              dataValue.Value ? (
+                <pre className="text-sm font-mono bg-bg-tertiary p-3 rounded overflow-x-auto">
+                  {dataValue.Value}
+                </pre>
+              ) : (
+                <p className="text-warning text-sm">
+                  Value is masked. Check the YAML tab for the base64-encoded value.
+                </p>
+              )
             ) : (
               <p className="text-text-tertiary text-sm">
-                Click "Reveal" to show warning about secret data visibility
+                {dataValue.Masked ? 'Value is masked' : 'Click "Reveal" to show value'}
               </p>
             )}
           </div>

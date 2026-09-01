@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { usePods, useDeployments, useServices, useNodes } from './useResources'
+import { usePods, useDeployments, useServices, useNodes, useConfigMaps, useSecrets } from './useResources'
 import { useProblems } from './useProblems'
 import { useNamespaces, useClusterHealth } from './useCluster'
 import { useUIStore } from '@/stores/ui'
@@ -42,6 +42,8 @@ export function useSidebarData() {
   const { data: podsData } = usePods(selectedNamespace ?? undefined)
   const { data: deploymentsData } = useDeployments(selectedNamespace ?? undefined)
   const { data: servicesData } = useServices(selectedNamespace ?? undefined)
+  const { data: configmapsData } = useConfigMaps(selectedNamespace ?? undefined)
+  const { data: secretsData } = useSecrets(selectedNamespace ?? undefined)
   const { data: nodesData } = useNodes()
   const { data: namespacesData } = useNamespaces()
   const { data: healthData } = useClusterHealth()
@@ -58,14 +60,14 @@ export function useSidebarData() {
       services: servicesData?.items.length ?? 0,
       ingresses: 0,
       endpoints: 0,
-      configmaps: 0,
-      secrets: 0,
+      configmaps: configmapsData?.items.length ?? 0,
+      secrets: secretsData?.items.length ?? 0,
       pvcs: 0,
       pvs: 0,
       nodes: nodesData?.items.length ?? healthData?.nodes.total ?? 0,
       namespaces: namespacesData?.namespaces.length ?? 0,
     }
-  }, [podsData, deploymentsData, servicesData, nodesData, namespacesData, healthData])
+  }, [podsData, deploymentsData, servicesData, configmapsData, secretsData, nodesData, namespacesData, healthData])
 
   const problems = useMemo<SidebarProblems>(() => {
     if (!problemsData?.problems) return defaultProblems

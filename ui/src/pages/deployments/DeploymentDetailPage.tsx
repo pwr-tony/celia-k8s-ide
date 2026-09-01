@@ -35,8 +35,23 @@ function DeploymentOverview({ deployment }: { deployment: Deployment }) {
 
       <section>
         <h3 className="text-sm font-medium text-text-secondary mb-4">Strategy</h3>
-        <div className="card p-4">
-          <span className="text-text-primary font-medium">{deployment.Strategy}</span>
+        <div className="card p-4 space-y-2">
+          <div className="flex items-center gap-2">
+            <span className="text-text-secondary">Type:</span>
+            <span className="text-text-primary font-medium">{deployment.Strategy.Type}</span>
+          </div>
+          {deployment.Strategy.MaxUnavailable && (
+            <div className="flex items-center gap-2">
+              <span className="text-text-secondary">Max Unavailable:</span>
+              <span className="text-text-primary">{deployment.Strategy.MaxUnavailable}</span>
+            </div>
+          )}
+          {deployment.Strategy.MaxSurge && (
+            <div className="flex items-center gap-2">
+              <span className="text-text-secondary">Max Surge:</span>
+              <span className="text-text-primary">{deployment.Strategy.MaxSurge}</span>
+            </div>
+          )}
         </div>
       </section>
 

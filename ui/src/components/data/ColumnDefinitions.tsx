@@ -176,9 +176,9 @@ const _secretColumns = [
     header: 'Type',
     cell: (info) => <span className="text-text-secondary">{info.getValue()}</span>,
   }),
-  secretHelper.accessor('DataKeys', {
-    header: 'Data Keys',
-    cell: (info) => info.getValue()?.length ?? 0,
+  secretHelper.accessor('Data', {
+    header: 'Keys',
+    cell: (info) => Object.keys(info.getValue() ?? {}).length,
   }),
   secretHelper.accessor('CreatedAt', {
     header: 'Age',

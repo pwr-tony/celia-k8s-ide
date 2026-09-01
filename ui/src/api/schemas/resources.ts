@@ -45,8 +45,8 @@ export const PodSchema = z.object({
   HostIP: z.string(),
   RestartCount: z.number(),
   CreatedAt: z.string(),
-  Labels: z.record(z.string(), z.string()),
-  Annotations: z.record(z.string(), z.string()).optional(),
+  Labels: z.record(z.string(), z.string()).nullable(),
+  Annotations: z.record(z.string(), z.string()).nullable().optional(),
   Containers: z.array(ContainerStatusSchema),
   InitContainers: z.array(ContainerStatusSchema).nullable(),
   Conditions: z.array(ConditionSchema),
@@ -76,6 +76,12 @@ export const DeploymentConditionSchema = z.object({
   LastUpdateTime: z.string().optional(),
 })
 
+const DeploymentStrategySchema = z.object({
+  Type: z.string(),
+  MaxUnavailable: z.string().optional(),
+  MaxSurge: z.string().optional(),
+})
+
 export const DeploymentSchema = z.object({
   Name: z.string(),
   Namespace: z.string(),
@@ -84,14 +90,16 @@ export const DeploymentSchema = z.object({
   AvailableReplicas: z.number(),
   UnavailableReplicas: z.number(),
   UpdatedReplicas: z.number(),
-  Strategy: z.string(),
+  Strategy: DeploymentStrategySchema,
   CreatedAt: z.string(),
-  Labels: z.record(z.string(), z.string()),
-  Selector: z.record(z.string(), z.string()).optional(),
-  Conditions: z.array(DeploymentConditionSchema),
+  Labels: z.record(z.string(), z.string()).nullable(),
+  Selector: z.record(z.string(), z.string()).nullable(),
+  Conditions: z.array(DeploymentConditionSchema).nullable(),
   Kind: z.string().optional(),
   APIVersion: z.string().optional(),
   UID: z.string().optional(),
+  MinReadySeconds: z.number().optional(),
+  ObservedGeneration: z.number().optional(),
 })
 
 export const DeploymentsResponseSchema = z.object({
@@ -112,14 +120,17 @@ export const ServiceSchema = z.object({
   Namespace: z.string(),
   Type: z.string(),
   ClusterIP: z.string(),
+  ClusterIPs: z.array(z.string()).nullable().optional(),
   ExternalIPs: z.array(z.string()).nullable(),
-  Ports: z.array(ServicePortSchema),
+  Ports: z.array(ServicePortSchema).nullable(),
   Selector: z.record(z.string(), z.string()).nullable(),
   CreatedAt: z.string(),
-  Labels: z.record(z.string(), z.string()),
+  Labels: z.record(z.string(), z.string()).nullable(),
   Kind: z.string().optional(),
   APIVersion: z.string().optional(),
   UID: z.string().optional(),
+  ExternalName: z.string().optional(),
+  LoadBalancerIP: z.string().optional(),
 })
 
 export const ServicesResponseSchema = z.object({
@@ -213,12 +224,14 @@ export type UpdateResourceResponse = z.infer<typeof UpdateResourceResponseSchema
 export const ConfigMapSchema = z.object({
   Name: z.string(),
   Namespace: z.string(),
-  Data: z.record(z.string(), z.string()),
+  Data: z.record(z.string(), z.string()).nullable(),
   CreatedAt: z.string(),
-  Labels: z.record(z.string(), z.string()),
+  Labels: z.record(z.string(), z.string()).nullable(),
   Kind: z.string().optional(),
   APIVersion: z.string().optional(),
   UID: z.string().optional(),
+  BinaryData: z.record(z.string(), z.string()).nullable().optional(),
+  Immutable: z.boolean().optional(),
 })
 
 export const ConfigMapsResponseSchema = z.object({
@@ -226,16 +239,23 @@ export const ConfigMapsResponseSchema = z.object({
   count: z.number(),
 })
 
+const SecretDataValueSchema = z.object({
+  Value: z.string().nullable(),
+  Masked: z.boolean(),
+  Size: z.number(),
+})
+
 export const SecretSchema = z.object({
   Name: z.string(),
   Namespace: z.string(),
   Type: z.string(),
-  DataKeys: z.array(z.string()),
+  Data: z.record(z.string(), SecretDataValueSchema).nullable(),
   CreatedAt: z.string(),
-  Labels: z.record(z.string(), z.string()),
+  Labels: z.record(z.string(), z.string()).nullable(),
   Kind: z.string().optional(),
   APIVersion: z.string().optional(),
   UID: z.string().optional(),
+  Immutable: z.boolean().optional(),
 })
 
 export const SecretsResponseSchema = z.object({
@@ -256,4 +276,5 @@ export type EventsResponse = z.infer<typeof EventsResponseSchema>
 export type ConfigMap = z.infer<typeof ConfigMapSchema>
 export type ConfigMapsResponse = z.infer<typeof ConfigMapsResponseSchema>
 export type Secret = z.infer<typeof SecretSchema>
+export type SecretDataValue = z.infer<typeof SecretDataValueSchema>
 export type SecretsResponse = z.infer<typeof SecretsResponseSchema>
