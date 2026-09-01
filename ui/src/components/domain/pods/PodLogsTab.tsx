@@ -1,14 +1,48 @@
 import { useQuery } from '@tanstack/react-query'
 import { get } from '@/api/client'
 import { z } from 'zod'
-import { useState, useRef, useEffect } from 'react'
-import { Loader2, Download, RefreshCw } from 'lucide-react'
+import { useState, useRef, useEffect, useMemo } from 'react'
+import { Loader2, Download, RefreshCw, Search, X } from 'lucide-react'
 import { Button, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives'
 import type { Pod } from '@/api/schemas'
 
 const LogsResponseSchema = z.object({
   logs: z.string(),
 })
+
+type LogLevel = 'error' | 'warn' | 'info' | 'debug' | 'default'
+
+function detectLogLevel(line: string): LogLevel {
+  const lower = line.toLowerCase()
+  if (/\berror\b|\bfatal\b|\bpanic\b|\bfailed\b/.test(lower)) return 'error'
+  if (/\bwarn(ing)?\b/.test(lower)) return 'warn'
+  if (/\binfo\b/.test(lower)) return 'info'
+  if (/\bdebug\b|\btrace\b/.test(lower)) return 'debug'
+  return 'default'
+}
+
+const levelStyles: Record<LogLevel, string> = {
+  error: 'text-red-400',
+  warn: 'text-yellow-400',
+  info: 'text-blue-400',
+  debug: 'text-gray-500',
+  default: 'text-gray-300',
+}
+
+function highlightMatch(text: string, query: string): React.ReactNode {
+  if (!query) return text
+  const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi')
+  const parts = text.split(regex)
+  return parts.map((part, i) =>
+    regex.test(part) ? (
+      <mark key={i} className="bg-yellow-500/40 text-inherit rounded px-0.5">
+        {part}
+      </mark>
+    ) : (
+      part
+    )
+  )
+}
 
 interface PodLogsTabProps {
   namespace: string
@@ -19,7 +53,9 @@ interface PodLogsTabProps {
 export function PodLogsTab({ namespace, podName, containers }: PodLogsTabProps) {
   const [selectedContainer, setSelectedContainer] = useState(containers?.[0]?.Name ?? '')
   const [tailLines, setTailLines] = useState('100')
+  const [searchQuery, setSearchQuery] = useState('')
   const logsEndRef = useRef<HTMLDivElement>(null)
+  const searchInputRef = useRef<HTMLInputElement>(null)
 
   const { data, isLoading, refetch, isFetching } = useQuery({
     queryKey: ['logs', namespace, podName, selectedContainer, tailLines],
@@ -31,6 +67,25 @@ export function PodLogsTab({ namespace, podName, containers }: PodLogsTabProps) 
     enabled: Boolean(selectedContainer),
     refetchInterval: 5000,
   })
+
+  const processedLines = useMemo(() => {
+    if (!data?.logs) return []
+    const lines = data.logs.split('\n')
+    const query = searchQuery.toLowerCase().trim()
+
+    return lines
+      .filter(line => !query || line.toLowerCase().includes(query))
+      .map((line, idx) => ({
+        key: idx,
+        text: line,
+        level: detectLogLevel(line),
+      }))
+  }, [data?.logs, searchQuery])
+
+  const matchCount = useMemo(() => {
+    if (!searchQuery.trim() || !data?.logs) return 0
+    return processedLines.length
+  }, [processedLines.length, searchQuery, data?.logs])
 
   useEffect(() => {
     if (logsEndRef.current) {
@@ -86,6 +141,31 @@ export function PodLogsTab({ namespace, podName, containers }: PodLogsTabProps) 
           </SelectContent>
         </Select>
 
+        <div className="relative flex-1 max-w-xs">
+          <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-text-secondary" />
+          <input
+            ref={searchInputRef}
+            type="text"
+            placeholder="Filter logs..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-8 pr-8 py-1.5 text-sm bg-bg-primary border border-border-subtle rounded focus:outline-none focus:border-accent-primary"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
+        </div>
+        {searchQuery && (
+          <span className="text-xs text-text-secondary">
+            {matchCount} match{matchCount !== 1 ? 'es' : ''}
+          </span>
+        )}
+
         <div className="flex-1" />
 
         <Button variant="ghost" size="sm" onClick={() => refetch()} disabled={isFetching}>
@@ -104,11 +184,19 @@ export function PodLogsTab({ namespace, podName, containers }: PodLogsTabProps) 
           <div className="flex items-center justify-center h-full">
             <Loader2 className="h-8 w-8 animate-spin text-text-secondary" />
           </div>
-        ) : data?.logs ? (
-          <pre className="font-mono text-xs text-gray-300 whitespace-pre-wrap break-all">
-            {data.logs}
+        ) : processedLines.length > 0 ? (
+          <pre className="font-mono text-xs whitespace-pre-wrap break-all">
+            {processedLines.map(({ key, text, level }) => (
+              <div key={key} className={levelStyles[level]}>
+                {searchQuery ? highlightMatch(text, searchQuery) : text}
+              </div>
+            ))}
             <div ref={logsEndRef} />
           </pre>
+        ) : searchQuery ? (
+          <div className="flex items-center justify-center h-full text-text-secondary">
+            No matching logs
+          </div>
         ) : (
           <div className="flex items-center justify-center h-full text-text-secondary">
             No logs available

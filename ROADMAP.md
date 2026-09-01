@@ -34,7 +34,7 @@
 - [x] Resource search/filter in tables
 - [x] Tauri shell for desktop packaging (RPM/DEB)
 
-## Phase 2: Observability Core (60% Complete)
+## Phase 2: Observability Core (75% Complete)
 
 - [x] WebSocket infrastructure with auto-reconnect
 - [x] Log viewer with container selector
@@ -42,8 +42,8 @@
 - [x] Download logs as file
 - [x] Auto-refresh logs (5s interval)
 - [x] Event list per resource
-- [ ] Log text search/filtering
-- [ ] Log highlighting by level (error, warning, info)
+- [x] Log text search/filtering
+- [x] Log highlighting by level (error, warning, info)
 - [ ] Event timeline visualization
 - [ ] Metrics-server integration
 - [ ] Node metrics dashboard (CPU, memory, pods)
