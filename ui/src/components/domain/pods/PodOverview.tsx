@@ -1,6 +1,7 @@
 import type { Pod } from '@/api/schemas'
 import { StatusBadge, getPodStatus } from '@/components/data'
-import { Box, Server, RefreshCw, Calendar, Tag } from 'lucide-react'
+import { ResourceCorrelation, buildCorrelationChain } from '@/components/domain/ResourceCorrelation'
+import { Box, Server, RefreshCw, Calendar, Tag, GitBranch } from 'lucide-react'
 
 interface PodOverviewProps {
   pod: Pod | undefined
@@ -71,18 +72,15 @@ export function PodOverview({ pod }: PodOverviewProps) {
       </section>
 
       <section>
-        <h3 className="text-sm font-medium text-text-secondary mb-4">Ownership</h3>
+        <h3 className="text-sm font-medium text-text-secondary mb-4 flex items-center gap-2">
+          <GitBranch className="h-4 w-4" />
+          Resource Chain
+        </h3>
         <div className="card p-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <span className="text-sm text-text-tertiary">Owner Kind</span>
-              <p>{pod.OwnerKind || '-'}</p>
-            </div>
-            <div>
-              <span className="text-sm text-text-tertiary">Owner Name</span>
-              <p>{pod.OwnerName || '-'}</p>
-            </div>
-          </div>
+          <ResourceCorrelation
+            chain={buildCorrelationChain(pod.OwnerKind, pod.OwnerName, 'Pod', pod.Name, pod.Namespace)}
+            currentResource={pod.Name}
+          />
         </div>
       </section>
 
