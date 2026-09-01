@@ -1,6 +1,7 @@
 import { useParams } from 'react-router'
 import { useNode } from '@/api/hooks'
 import { ResourceDetailLayout, ResourceYAMLTab, ResourceEventsTab } from '@/components/domain/ResourceDetail'
+import { NodeMetricsTab } from '@/components/domain/nodes'
 import { getNodeStatus, StatusBadge } from '@/components/data'
 import { ROUTES } from '@/router/routes'
 import { Loader2, Tag, Server, Cpu, HardDrive } from 'lucide-react'
@@ -225,6 +226,7 @@ export function NodeDetailPage() {
 
   const tabs = [
     { id: 'overview', label: 'Overview', content: <NodeOverview node={node} /> },
+    { id: 'metrics', label: 'Metrics', content: <NodeMetricsTab nodeName={name!} /> },
     { id: 'yaml', label: 'YAML', content: <ResourceYAMLTab kind="Node" namespace="" name={name!} /> },
     { id: 'events', label: 'Events', content: <ResourceEventsTab namespace="" resourceName={name!} resourceKind="Node" /> },
   ]

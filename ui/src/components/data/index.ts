@@ -9,3 +9,4 @@ export {
   secretColumns,
   nodeColumns,
 } from './ColumnDefinitions'
+export { ResourceUsageBar, formatBytes, formatCPU } from './ResourceUsageBar'

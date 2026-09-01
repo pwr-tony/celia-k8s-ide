@@ -34,7 +34,7 @@
 - [x] Resource search/filter in tables
 - [x] Tauri shell for desktop packaging (RPM/DEB)
 
-## Phase 2: Observability Core (80% Complete)
+## Phase 2: Observability Core ✅ COMPLETE
 
 - [x] WebSocket infrastructure with auto-reconnect
 - [x] Log viewer with container selector
@@ -45,10 +45,10 @@
 - [x] Log text search/filtering
 - [x] Log highlighting by level (error, warning, info)
 - [x] Event timeline visualization
-- [ ] Metrics-server integration
-- [ ] Node metrics dashboard (CPU, memory, pods)
-- [ ] Pod metrics in detail view
-- [ ] Namespace resource usage
+- [x] Metrics-server integration
+- [x] Node metrics dashboard (CPU, memory)
+- [x] Pod metrics in detail view
+- [ ] Namespace resource usage (deferred to Phase 6)
 
 ## Phase 3: Troubleshooting Engine (50% Complete)
 

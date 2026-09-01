@@ -1,7 +1,7 @@
 import { useParams } from 'react-router'
 import { usePod } from '@/api/hooks'
 import { ResourceDetailLayout, ResourceYAMLTab, ResourceEventsTab } from '@/components/domain/ResourceDetail'
-import { PodOverview, PodContainersTab, PodLogsTab } from '@/components/domain/pods'
+import { PodOverview, PodContainersTab, PodLogsTab, PodMetricsTab } from '@/components/domain/pods'
 import { getPodStatus } from '@/components/data'
 import { ROUTES } from '@/router/routes'
 import { Loader2 } from 'lucide-react'
@@ -29,6 +29,7 @@ export function PodDetailPage() {
   const tabs = [
     { id: 'overview', label: 'Overview', content: <PodOverview pod={pod} /> },
     { id: 'containers', label: 'Containers', content: <PodContainersTab pod={pod} /> },
+    { id: 'metrics', label: 'Metrics', content: <PodMetricsTab namespace={namespace!} podName={name!} /> },
     { id: 'yaml', label: 'YAML', content: <ResourceYAMLTab kind="Pod" namespace={namespace!} name={name!} /> },
     { id: 'events', label: 'Events', content: <ResourceEventsTab namespace={namespace!} resourceName={name!} resourceKind="Pod" /> },
     { id: 'logs', label: 'Logs', content: <PodLogsTab namespace={namespace!} podName={name!} containers={pod.Containers} /> },
