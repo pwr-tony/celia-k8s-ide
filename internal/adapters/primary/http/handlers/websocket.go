@@ -10,6 +10,7 @@ import (
 
 	"github.com/gorilla/websocket"
 	"github.com/tonymora/celia/internal/application/observability"
+	"github.com/tonymora/celia/internal/application/trouble"
 	"github.com/tonymora/celia/pkg/logger"
 )
 
@@ -23,12 +24,14 @@ var upgrader = websocket.Upgrader{
 
 type WSHandler struct {
 	observabilityService *observability.Service
+	troubleService       *trouble.Service
 	log                  *logger.Logger
 }
 
-func NewWSHandler(observabilityService *observability.Service, log *logger.Logger) *WSHandler {
+func NewWSHandler(observabilityService *observability.Service, troubleService *trouble.Service, log *logger.Logger) *WSHandler {
 	return &WSHandler{
 		observabilityService: observabilityService,
+		troubleService:       troubleService,
 		log:                  log.WithComponent("websocket-handler"),
 	}
 }
@@ -117,6 +120,17 @@ func (h *WSHandler) HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 			cancel()
 			ctx, cancel = context.WithCancel(r.Context())
 
+		case "problems.subscribe":
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				h.streamProblems(ctx, conn, &mu)
+			}()
+
+		case "problems.unsubscribe":
+			cancel()
+			ctx, cancel = context.WithCancel(r.Context())
+
 		case "ping":
 			writeJSON(map[string]string{"type": "pong"})
 
@@ -184,4 +198,50 @@ func (h *WSHandler) streamLogs(ctx context.Context, conn *websocket.Conn, mu *sy
 	}
 
 	writeJSON(map[string]string{"type": "logs.end", "pod": payload.Pod})
+}
+
+func (h *WSHandler) streamProblems(ctx context.Context, conn *websocket.Conn, mu *sync.Mutex) {
+	h.log.Info("Starting problems stream")
+
+	writeJSON := func(v interface{}) error {
+		mu.Lock()
+		defer mu.Unlock()
+		return conn.WriteJSON(v)
+	}
+
+	ticker := time.NewTicker(5 * time.Second)
+	defer ticker.Stop()
+
+	var lastProblemsHash string
+
+	sendProblems := func() {
+		problems, err := h.troubleService.GetProblems(ctx)
+		if err != nil {
+			writeJSON(ErrorMessage{Type: "error", Message: "Failed to get problems: " + err.Error()})
+			return
+		}
+
+		data, _ := json.Marshal(problems)
+		currentHash := string(data)
+
+		if currentHash != lastProblemsHash {
+			lastProblemsHash = currentHash
+			writeJSON(map[string]interface{}{
+				"type":    "problems.update",
+				"payload": problems,
+			})
+		}
+	}
+
+	sendProblems()
+
+	for {
+		select {
+		case <-ctx.Done():
+			h.log.Info("Stopping problems stream")
+			return
+		case <-ticker.C:
+			sendProblems()
+		}
+	}
 }

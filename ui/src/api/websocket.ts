@@ -172,6 +172,18 @@ export class WebSocketManager {
   ping(): void {
     this.send({ type: 'ping' })
   }
+
+  subscribeProblems(): void {
+    this.send({ type: 'problems.subscribe' })
+  }
+
+  unsubscribeProblems(): void {
+    this.send({ type: 'problems.unsubscribe' })
+  }
+
+  onProblemsUpdate(handler: (data: { type: string; payload: unknown }) => void): () => void {
+    return this.on('problems.update', handler as MessageHandler)
+  }
 }
 
 import { getWsUrl } from '@/lib/environment'

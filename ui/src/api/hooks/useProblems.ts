@@ -1,5 +1,7 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useEffect } from 'react'
 import { get } from '../client'
+import { getWebSocket } from '../websocket'
 import {
   ProblemsResponseSchema,
   ProblemStatsSchema,
@@ -40,4 +42,28 @@ export function useDiagnosis(kind: string, namespace: string, name: string) {
     queryFn: () => get<Diagnosis>(`/diagnosis/${kind}/${namespace}/${name}`, DiagnosisSchema),
     enabled: Boolean(kind && namespace && name),
   })
+}
+
+export function useProblemsRealtime() {
+  const queryClient = useQueryClient()
+
+  useEffect(() => {
+    const ws = getWebSocket()
+
+    if (!ws.isConnected) {
+      ws.connect()
+    }
+
+    ws.subscribeProblems()
+
+    const unsubscribe = ws.onProblemsUpdate((data) => {
+      const payload = data.payload as ProblemsResponse
+      queryClient.setQueryData(problemKeys.list(undefined), payload)
+    })
+
+    return () => {
+      unsubscribe()
+      ws.unsubscribeProblems()
+    }
+  }, [queryClient])
 }

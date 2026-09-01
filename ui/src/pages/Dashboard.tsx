@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useConnection, useClusterHealth } from '@/api/hooks'
-import { useProblems } from '@/api/hooks'
+import { useProblems, useProblemsRealtime } from '@/api/hooks'
 import { Button } from '@/components/primitives'
 import { StatCard } from '@/components/data/StatCard'
 import { ProblemCard } from '@/components/data/ProblemCard'
@@ -96,6 +96,8 @@ function ClusterStats() {
 function ProblemsList() {
   const { data: problems, isLoading } = useProblems()
   const [selectedProblem, setSelectedProblem] = useState<Problem | null>(null)
+
+  useProblemsRealtime()
 
   if (isLoading) {
     return (

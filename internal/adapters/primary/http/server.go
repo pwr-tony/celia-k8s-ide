@@ -126,7 +126,7 @@ func (s *Server) setupRouter() http.Handler {
 	mux.HandleFunc("POST /api/v1/operations/purge", operationHandler.PurgePods)
 	mux.HandleFunc("GET /api/v1/operations/history", operationHandler.GetActionHistory)
 
-	wsHandler := handlers.NewWSHandler(s.observabilityService, s.log)
+	wsHandler := handlers.NewWSHandler(s.observabilityService, s.troubleService, s.log)
 	mux.HandleFunc("GET /api/v1/ws", wsHandler.HandleWebSocket)
 
 	handler := middleware.Logging(s.log)(mux)
