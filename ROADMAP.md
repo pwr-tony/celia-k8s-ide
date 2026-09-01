@@ -18,7 +18,7 @@
 - [x] File-based audit logging
 - [x] Makefile with build targets
 
-## Phase 1: Resource Explorer MVP (90% Complete)
+## Phase 1: Resource Explorer MVP ✅ COMPLETE
 
 - [x] React 19 + TypeScript (strict) frontend with Vite
 - [x] TanStack Query for server state, Zustand for UI state
@@ -32,7 +32,7 @@
 - [x] YAML syntax highlighting (Monaco Editor)
 - [x] Copy YAML to clipboard
 - [x] Resource search/filter in tables
-- [ ] Tauri shell for desktop packaging
+- [x] Tauri shell for desktop packaging (RPM/DEB)
 
 ## Phase 2: Observability Core (60% Complete)
 
