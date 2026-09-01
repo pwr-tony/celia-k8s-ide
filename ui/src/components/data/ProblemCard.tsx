@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils'
 import { SeverityBadge } from './SeverityBadge'
-import { ChevronRight } from 'lucide-react'
+import { ChevronRight, Box, Server, Layers, Settings } from 'lucide-react'
 
 type Severity = 1 | 2 | 3 | 4
 
@@ -10,8 +10,22 @@ interface ProblemCardProps {
   type: string
   namespace: string
   resourceName: string
+  resourceKind?: string
   severity: Severity
   onClick?: () => void
+}
+
+function getResourceIcon(kind?: string) {
+  switch (kind?.toLowerCase()) {
+    case 'pod':
+      return Box
+    case 'node':
+      return Server
+    case 'deployment':
+      return Layers
+    default:
+      return Settings
+  }
 }
 
 const severityGradients: Record<Severity, string> = {
@@ -33,9 +47,12 @@ export function ProblemCard({
   type,
   namespace,
   resourceName,
+  resourceKind,
   severity,
   onClick,
 }: ProblemCardProps) {
+  const ResourceIcon = getResourceIcon(resourceKind)
+
   return (
     <div
       onClick={onClick}
@@ -58,8 +75,9 @@ export function ProblemCard({
             <span className="font-medium text-text-primary truncate">{title}</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-text-secondary">
+            <ResourceIcon className="h-3.5 w-3.5 text-text-tertiary shrink-0" />
             <span className="truncate">
-              {namespace}/{resourceName}
+              {namespace ? `${namespace}/` : ''}{resourceName}
             </span>
             <span className="text-text-tertiary">•</span>
             <span className="text-text-tertiary font-mono text-xs">{type}</span>

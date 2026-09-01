@@ -1,11 +1,14 @@
+import { useState } from 'react'
 import { useConnection, useClusterHealth } from '@/api/hooks'
 import { useProblems } from '@/api/hooks'
 import { Button } from '@/components/primitives'
 import { StatCard } from '@/components/data/StatCard'
 import { ProblemCard } from '@/components/data/ProblemCard'
+import { ProblemDetailModal } from '@/components/domain/problems'
 import { AlertCircle, CheckCircle2, Loader2, Server, Box, AlertTriangle, Clock } from 'lucide-react'
 import { useNavigate } from 'react-router'
 import { ROUTES } from '@/router/routes'
+import type { Problem } from '@/api/schemas'
 
 function ConnectionStatus() {
   const { data: connection, isLoading } = useConnection()
@@ -92,7 +95,7 @@ function ClusterStats() {
 
 function ProblemsList() {
   const { data: problems, isLoading } = useProblems()
-  const navigate = useNavigate()
+  const [selectedProblem, setSelectedProblem] = useState<Problem | null>(null)
 
   if (isLoading) {
     return (
@@ -115,20 +118,29 @@ function ProblemsList() {
   }
 
   return (
-    <div className="space-y-3">
-      {problems.problems.slice(0, 10).map((problem) => (
-        <ProblemCard
-          key={problem.id}
-          id={problem.id}
-          title={problem.title}
-          type={problem.type}
-          namespace={problem.namespace}
-          resourceName={problem.resource_name}
-          severity={problem.severity as 1 | 2 | 3 | 4}
-          onClick={() => navigate(`${ROUTES.PODS}?highlight=${problem.resource_name}`)}
-        />
-      ))}
-    </div>
+    <>
+      <div className="space-y-3">
+        {problems.problems.slice(0, 10).map((problem) => (
+          <ProblemCard
+            key={problem.id}
+            id={problem.id}
+            title={problem.title}
+            type={problem.type}
+            namespace={problem.namespace}
+            resourceName={problem.resource_name}
+            resourceKind={problem.resource_kind}
+            severity={problem.severity as 1 | 2 | 3 | 4}
+            onClick={() => setSelectedProblem(problem)}
+          />
+        ))}
+      </div>
+
+      <ProblemDetailModal
+        problem={selectedProblem}
+        open={selectedProblem !== null}
+        onClose={() => setSelectedProblem(null)}
+      />
+    </>
   )
 }
 
