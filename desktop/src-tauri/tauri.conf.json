@@ -48,13 +48,7 @@
   },
   "plugins": {
     "shell": {
-      "sidecar": true,
-      "scope": [
-        {
-          "name": "binaries/celia-server",
-          "sidecar": true
-        }
-      ]
+      "open": true
     }
   }
 }
