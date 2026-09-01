@@ -1,7 +1,10 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { get } from '../client'
 import { getWebSocket } from '../websocket'
+import { useNotificationsStore } from '@/stores/notifications'
+import { useProblemHistoryStore } from '@/stores/problem-history'
+import { useSettingsStore } from '@/stores/settings'
 import {
   ProblemsResponseSchema,
   ProblemStatsSchema,
@@ -9,6 +12,7 @@ import {
   type ProblemsResponse,
   type ProblemStats,
   type Diagnosis,
+  type Problem,
 } from '../schemas'
 
 export const problemKeys = {
@@ -46,6 +50,10 @@ export function useDiagnosis(kind: string, namespace: string, name: string) {
 
 export function useProblemsRealtime() {
   const queryClient = useQueryClient()
+  const addNotification = useNotificationsStore((s) => s.addNotification)
+  const trackResolved = useProblemHistoryStore((s) => s.trackResolved)
+  const notificationMinSeverity = useSettingsStore((s) => s.notificationMinSeverity)
+  const previousProblemsRef = useRef<Set<string>>(new Set())
 
   useEffect(() => {
     const ws = getWebSocket()
@@ -58,6 +66,27 @@ export function useProblemsRealtime() {
 
     const unsubscribe = ws.onProblemsUpdate((data) => {
       const payload = data.payload as ProblemsResponse
+      const currentIds = new Set(payload.problems.map((p) => p.id))
+      const previousIds = previousProblemsRef.current
+
+      payload.problems.forEach((problem: Problem) => {
+        if (!previousIds.has(problem.id) && previousIds.size > 0) {
+          const severityLabel = problem.severity === 4 ? 'Critical' : problem.severity === 3 ? 'High' : 'Medium'
+          const notificationType = problem.severity >= 3 ? 'error' : 'warning'
+
+          if (problem.severity >= notificationMinSeverity) {
+            addNotification({
+              type: notificationType,
+              title: `${severityLabel}: ${problem.title}`,
+              message: `${problem.resource_kind} ${problem.namespace}/${problem.resource_name}`,
+              problemId: problem.id,
+            })
+          }
+        }
+      })
+
+      trackResolved(payload.problems)
+      previousProblemsRef.current = currentIds
       queryClient.setQueryData(problemKeys.list(undefined), payload)
     })
 
@@ -65,5 +94,5 @@ export function useProblemsRealtime() {
       unsubscribe()
       ws.unsubscribeProblems()
     }
-  }, [queryClient])
+  }, [queryClient, addNotification, trackResolved, notificationMinSeverity])
 }

@@ -4,7 +4,8 @@ import { useProblems, useProblemsRealtime } from '@/api/hooks'
 import { Button } from '@/components/primitives'
 import { StatCard } from '@/components/data/StatCard'
 import { ProblemCard } from '@/components/data/ProblemCard'
-import { ProblemDetailModal } from '@/components/domain/problems'
+import { ProblemDetailModal, ProblemHistory } from '@/components/domain/problems'
+import { NotificationCenter } from '@/components/notifications'
 import { AlertCircle, CheckCircle2, Loader2, Server, Box, AlertTriangle, Clock } from 'lucide-react'
 import { useNavigate } from 'react-router'
 import { ROUTES } from '@/router/routes'
@@ -157,7 +158,10 @@ export function Dashboard() {
             <h1 className="text-xl font-semibold text-text-primary">Dashboard</h1>
             <p className="text-sm text-text-tertiary mt-0.5">Cluster overview and health status</p>
           </div>
-          <ConnectionStatus />
+          <div className="flex items-center gap-4">
+            <NotificationCenter />
+            <ConnectionStatus />
+          </div>
         </div>
       </header>
 
@@ -178,21 +182,31 @@ export function Dashboard() {
             <ProblemsList />
           </div>
 
-          <div>
-            <div className="mb-4">
-              <h2 className="text-lg font-semibold">Quick Actions</h2>
-              <p className="text-sm text-text-tertiary">Common operations</p>
+          <div className="space-y-6">
+            <div>
+              <div className="mb-4">
+                <h2 className="text-lg font-semibold">Quick Actions</h2>
+                <p className="text-sm text-text-tertiary">Common operations</p>
+              </div>
+              <div className="rounded-lg border border-border-subtle bg-bg-secondary p-4 space-y-2">
+                <Button variant="secondary" className="w-full justify-start">
+                  Scale Deployment
+                </Button>
+                <Button variant="secondary" className="w-full justify-start">
+                  Rollout Restart
+                </Button>
+                <Button variant="danger" className="w-full justify-start">
+                  Purge Failed Pods
+                </Button>
+              </div>
             </div>
-            <div className="rounded-lg border border-border-subtle bg-bg-secondary p-4 space-y-2">
-              <Button variant="secondary" className="w-full justify-start">
-                Scale Deployment
-              </Button>
-              <Button variant="secondary" className="w-full justify-start">
-                Rollout Restart
-              </Button>
-              <Button variant="danger" className="w-full justify-start">
-                Purge Failed Pods
-              </Button>
+
+            <div>
+              <div className="mb-4">
+                <h2 className="text-lg font-semibold">Recently Resolved</h2>
+                <p className="text-sm text-text-tertiary">Problems that went away</p>
+              </div>
+              <ProblemHistory />
             </div>
           </div>
         </div>

@@ -50,7 +50,7 @@
 - [x] Pod metrics in detail view
 - [ ] Namespace resource usage (deferred to Phase 6)
 
-## Phase 3: Troubleshooting Engine (90% Complete)
+## Phase 3: Troubleshooting Engine ✅ COMPLETE
 
 - [x] "Top Problems" dashboard panel (top 10)
 - [x] Problem severity color coding (critical/high/medium/low)
@@ -61,9 +61,9 @@
 - [x] Problem → Resource navigation (click to resource)
 - [x] Real-time problem updates via WebSocket
 - [x] Pod → Deployment → ReplicaSet correlation view
-- [ ] Problem history and resolution tracking
-- [ ] Custom severity thresholds configuration
-- [ ] Problem notifications (in-app)
+- [x] Problem history and resolution tracking
+- [x] Custom severity thresholds configuration
+- [x] Problem notifications (in-app)
 
 ## Phase 4: Operations (40% Complete)
 
