@@ -6,6 +6,7 @@ import { StatCard } from '@/components/data/StatCard'
 import { ProblemCard } from '@/components/data/ProblemCard'
 import { ProblemDetailModal, ProblemHistory } from '@/components/domain/problems'
 import { NotificationCenter } from '@/components/notifications'
+import { QuickActions } from '@/components/operations'
 import { AlertCircle, CheckCircle2, Loader2, Server, Box, AlertTriangle, Clock } from 'lucide-react'
 import { useNavigate } from 'react-router'
 import { ROUTES } from '@/router/routes'
@@ -188,17 +189,7 @@ export function Dashboard() {
                 <h2 className="text-lg font-semibold">Quick Actions</h2>
                 <p className="text-sm text-text-tertiary">Common operations</p>
               </div>
-              <div className="rounded-lg border border-border-subtle bg-bg-secondary p-4 space-y-2">
-                <Button variant="secondary" className="w-full justify-start">
-                  Scale Deployment
-                </Button>
-                <Button variant="secondary" className="w-full justify-start">
-                  Rollout Restart
-                </Button>
-                <Button variant="danger" className="w-full justify-start">
-                  Purge Failed Pods
-                </Button>
-              </div>
+              <QuickActions />
             </div>
 
             <div>

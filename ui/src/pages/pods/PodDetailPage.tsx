@@ -1,14 +1,19 @@
-import { useParams } from 'react-router'
+import { useState } from 'react'
+import { useParams, useNavigate } from 'react-router'
 import { usePod } from '@/api/hooks'
 import { ResourceDetailLayout, ResourceYAMLTab, ResourceEventsTab } from '@/components/domain/ResourceDetail'
 import { PodOverview, PodContainersTab, PodLogsTab, PodMetricsTab } from '@/components/domain/pods'
+import { DeletePodDialog } from '@/components/operations'
+import { Button } from '@/components/primitives'
 import { getPodStatus } from '@/components/data'
 import { ROUTES } from '@/router/routes'
-import { Loader2 } from 'lucide-react'
+import { Loader2, Trash2 } from 'lucide-react'
 
 export function PodDetailPage() {
   const { namespace, name } = useParams<{ namespace: string; name: string }>()
   const { data: pod, isLoading } = usePod(namespace!, name!)
+  const [showDelete, setShowDelete] = useState(false)
+  const navigate = useNavigate()
 
   if (isLoading) {
     return (
@@ -35,18 +40,36 @@ export function PodDetailPage() {
     { id: 'logs', label: 'Logs', content: <PodLogsTab namespace={namespace!} podName={name!} containers={pod.Containers} /> },
   ]
 
+  const actions = (
+    <Button variant="danger" size="sm" onClick={() => setShowDelete(true)}>
+      <Trash2 className="h-4 w-4 mr-1" />
+      Delete
+    </Button>
+  )
+
   return (
-    <ResourceDetailLayout
-      kind="Pod"
-      name={pod.Name}
-      namespace={pod.Namespace}
-      status={pod.Status || pod.Phase}
-      statusType={getPodStatus(pod.Phase, pod.Status)}
-      breadcrumbs={[
-        { label: 'Pods', href: ROUTES.PODS },
-        { label: pod.Name },
-      ]}
-      tabs={tabs}
-    />
+    <>
+      <ResourceDetailLayout
+        kind="Pod"
+        name={pod.Name}
+        namespace={pod.Namespace}
+        status={pod.Status || pod.Phase}
+        statusType={getPodStatus(pod.Phase, pod.Status)}
+        breadcrumbs={[
+          { label: 'Pods', href: ROUTES.PODS },
+          { label: pod.Name },
+        ]}
+        tabs={tabs}
+        actions={actions}
+      />
+
+      <DeletePodDialog
+        open={showDelete}
+        onClose={() => setShowDelete(false)}
+        namespace={namespace!}
+        name={name!}
+        onSuccess={() => navigate(ROUTES.PODS)}
+      />
+    </>
   )
 }

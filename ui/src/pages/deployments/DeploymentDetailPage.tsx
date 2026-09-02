@@ -1,9 +1,12 @@
+import { useState } from 'react'
 import { useParams } from 'react-router'
 import { useDeployment } from '@/api/hooks'
 import { ResourceDetailLayout, ResourceYAMLTab, ResourceEventsTab } from '@/components/domain/ResourceDetail'
+import { ScaleDialog, RestartDialog } from '@/components/operations'
+import { Button } from '@/components/primitives'
 import { getDeploymentStatus, StatusBadge } from '@/components/data'
 import { ROUTES } from '@/router/routes'
-import { Loader2, Tag } from 'lucide-react'
+import { Loader2, Tag, ArrowUpDown, RefreshCw } from 'lucide-react'
 import type { Deployment } from '@/api/schemas'
 
 function DeploymentOverview({ deployment }: { deployment: Deployment }) {
@@ -113,6 +116,8 @@ function DeploymentOverview({ deployment }: { deployment: Deployment }) {
 export function DeploymentDetailPage() {
   const { namespace, name } = useParams<{ namespace: string; name: string }>()
   const { data: deployment, isLoading } = useDeployment(namespace!, name!)
+  const [showScale, setShowScale] = useState(false)
+  const [showRestart, setShowRestart] = useState(false)
 
   if (isLoading) {
     return (
@@ -136,18 +141,50 @@ export function DeploymentDetailPage() {
     { id: 'events', label: 'Events', content: <ResourceEventsTab namespace={namespace!} resourceName={name!} resourceKind="Deployment" /> },
   ]
 
+  const actions = (
+    <div className="flex items-center gap-2">
+      <Button variant="secondary" size="sm" onClick={() => setShowScale(true)}>
+        <ArrowUpDown className="h-4 w-4 mr-1" />
+        Scale
+      </Button>
+      <Button variant="secondary" size="sm" onClick={() => setShowRestart(true)}>
+        <RefreshCw className="h-4 w-4 mr-1" />
+        Restart
+      </Button>
+    </div>
+  )
+
   return (
-    <ResourceDetailLayout
-      kind="Deployment"
-      name={deployment.Name}
-      namespace={deployment.Namespace}
-      status={`${deployment.ReadyReplicas}/${deployment.Replicas}`}
-      statusType={getDeploymentStatus(deployment.ReadyReplicas, deployment.Replicas)}
-      breadcrumbs={[
-        { label: 'Deployments', href: ROUTES.DEPLOYMENTS },
-        { label: deployment.Name },
-      ]}
-      tabs={tabs}
-    />
+    <>
+      <ResourceDetailLayout
+        kind="Deployment"
+        name={deployment.Name}
+        namespace={deployment.Namespace}
+        status={`${deployment.ReadyReplicas}/${deployment.Replicas}`}
+        statusType={getDeploymentStatus(deployment.ReadyReplicas, deployment.Replicas)}
+        breadcrumbs={[
+          { label: 'Deployments', href: ROUTES.DEPLOYMENTS },
+          { label: deployment.Name },
+        ]}
+        tabs={tabs}
+        actions={actions}
+      />
+
+      <ScaleDialog
+        open={showScale}
+        onClose={() => setShowScale(false)}
+        namespace={namespace!}
+        name={name!}
+        currentReplicas={deployment.Replicas}
+      />
+
+      <RestartDialog
+        open={showRestart}
+        onClose={() => setShowRestart(false)}
+        kind="Deployment"
+        namespace={namespace!}
+        name={name!}
+      />
+    </>
   )
 }

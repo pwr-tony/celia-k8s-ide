@@ -65,16 +65,16 @@
 - [x] Custom severity thresholds configuration
 - [x] Problem notifications (in-app)
 
-## Phase 4: Operations (40% Complete)
+## Phase 4: Operations (70% Complete)
 
 - [x] Scale deployment (API hook ready)
 - [x] Rollout restart (API hook ready)
 - [x] Delete pod (API hook ready)
 - [x] Purge failed pods (API hook ready)
 - [x] Action history hook
-- [ ] Operation confirmation dialogs with details
+- [x] Operation confirmation dialogs with details
+- [x] Grace period option for delete
 - [ ] Edit YAML and apply (kubectl edit style)
-- [ ] Grace period option for delete
 - [ ] Undo recent operations (where possible)
 - [ ] Audit log viewer in UI
 - [ ] Export audit log
