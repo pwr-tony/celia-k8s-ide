@@ -22,7 +22,8 @@ type Action struct {
 	Namespace    string
 	ResourceName string
 
-	Parameters map[string]interface{}
+	Parameters    map[string]interface{}
+	PreviousState map[string]interface{}
 
 	CreatedAt   time.Time
 	StartedAt   *time.Time
@@ -32,18 +33,20 @@ type Action struct {
 	Error   string
 
 	RequestedBy string
+	UndoneBy    string
 }
 
 func NewAction(actionType ActionType, resourceKind, namespace, resourceName string) *Action {
 	return &Action{
-		ID:           generateActionID(),
-		Type:         actionType,
-		Status:       ActionStatusPending,
-		ResourceKind: resourceKind,
-		Namespace:    namespace,
-		ResourceName: resourceName,
-		Parameters:   make(map[string]interface{}),
-		CreatedAt:    time.Now(),
+		ID:            generateActionID(),
+		Type:          actionType,
+		Status:        ActionStatusPending,
+		ResourceKind:  resourceKind,
+		Namespace:     namespace,
+		ResourceName:  resourceName,
+		Parameters:    make(map[string]interface{}),
+		PreviousState: make(map[string]interface{}),
+		CreatedAt:     time.Now(),
 	}
 }
 
@@ -116,6 +119,34 @@ func (a *Action) SetParameter(key string, value interface{}) {
 func (a *Action) GetParameter(key string) (interface{}, bool) {
 	val, ok := a.Parameters[key]
 	return val, ok
+}
+
+func (a *Action) SetPreviousState(key string, value interface{}) {
+	a.PreviousState[key] = value
+}
+
+func (a *Action) GetPreviousState(key string) (interface{}, bool) {
+	val, ok := a.PreviousState[key]
+	return val, ok
+}
+
+func (a *Action) CanUndo() bool {
+	if a.UndoneBy != "" {
+		return false
+	}
+	if !a.IsCompleted() {
+		return false
+	}
+	switch a.Type {
+	case ActionTypeScale, ActionTypeUpdate:
+		return len(a.PreviousState) > 0
+	default:
+		return false
+	}
+}
+
+func (a *Action) MarkUndone(undoActionID string) {
+	a.UndoneBy = undoActionID
 }
 
 func (a *Action) ResourceKey() string {

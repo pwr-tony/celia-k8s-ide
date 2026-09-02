@@ -41,10 +41,15 @@ func (s *Service) ScaleDeployment(ctx context.Context, namespace, name string, r
 	action := operation.NewAction(operation.ActionTypeScale, "Deployment", namespace, name)
 	action.SetParameter("replicas", replicas)
 
+	currentReplicas, err := s.k8sAdapter.GetDeploymentReplicas(ctx, namespace, name)
+	if err == nil {
+		action.SetPreviousState("replicas", currentReplicas)
+	}
+
 	beforeYAML, _ := s.k8sAdapter.GetResourceYAML(ctx, resource.KindDeployment, namespace, name)
 
 	action.Start()
-	err := s.k8sAdapter.ScaleDeployment(ctx, namespace, name, replicas)
+	err = s.k8sAdapter.ScaleDeployment(ctx, namespace, name, replicas)
 
 	var result *operation.ActionResult
 	if err != nil {
@@ -140,6 +145,9 @@ func (s *Service) UpdateResource(ctx context.Context, kind, namespace, name stri
 	action := operation.NewAction(operation.ActionTypeUpdate, kind, namespace, name)
 
 	beforeYAML, _ := s.k8sAdapter.GetResourceYAML(ctx, resourceKind, namespace, name)
+	if beforeYAML != "" {
+		action.SetPreviousState("yaml", beforeYAML)
+	}
 
 	action.Start()
 	err := s.k8sAdapter.UpdateResource(ctx, resourceKind, namespace, name, yaml)
@@ -209,6 +217,91 @@ func (s *Service) CancelAction(ctx context.Context, actionID string) error {
 
 	action.Cancel()
 	return nil
+}
+
+func (s *Service) UndoAction(ctx context.Context, actionID string) (*operation.ActionResult, error) {
+	s.mu.Lock()
+	var targetAction *operation.Action
+	for i := range s.history {
+		if s.history[i].ID == actionID {
+			targetAction = &s.history[i]
+			break
+		}
+	}
+	s.mu.Unlock()
+
+	if targetAction == nil {
+		return nil, fmt.Errorf("action not found: %s", actionID)
+	}
+
+	if !targetAction.CanUndo() {
+		return nil, fmt.Errorf("action cannot be undone")
+	}
+
+	switch targetAction.Type {
+	case operation.ActionTypeScale:
+		prevReplicas, ok := targetAction.GetPreviousState("replicas")
+		if !ok {
+			return nil, fmt.Errorf("previous replica count not found")
+		}
+		replicas, ok := prevReplicas.(int32)
+		if !ok {
+			if f, ok := prevReplicas.(float64); ok {
+				replicas = int32(f)
+			} else {
+				return nil, fmt.Errorf("invalid previous replica count")
+			}
+		}
+		result, err := s.ScaleDeployment(ctx, targetAction.Namespace, targetAction.ResourceName, replicas)
+		if err == nil {
+			s.mu.Lock()
+			for i := range s.history {
+				if s.history[i].ID == actionID {
+					s.history[i].MarkUndone(result.ActionID)
+					break
+				}
+			}
+			s.mu.Unlock()
+		}
+		return result, err
+
+	case operation.ActionTypeUpdate:
+		prevYAML, ok := targetAction.GetPreviousState("yaml")
+		if !ok {
+			return nil, fmt.Errorf("previous YAML not found")
+		}
+		yaml, ok := prevYAML.(string)
+		if !ok {
+			return nil, fmt.Errorf("invalid previous YAML")
+		}
+		result, err := s.UpdateResource(ctx, targetAction.ResourceKind, targetAction.Namespace, targetAction.ResourceName, yaml)
+		if err == nil {
+			s.mu.Lock()
+			for i := range s.history {
+				if s.history[i].ID == actionID {
+					s.history[i].MarkUndone(result.ActionID)
+					break
+				}
+			}
+			s.mu.Unlock()
+		}
+		return result, err
+
+	default:
+		return nil, fmt.Errorf("undo not supported for action type: %s", targetAction.Type)
+	}
+}
+
+func (s *Service) GetAction(ctx context.Context, actionID string) (*operation.Action, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	for i := range s.history {
+		if s.history[i].ID == actionID {
+			return &s.history[i], nil
+		}
+	}
+	return nil, fmt.Errorf("action not found: %s", actionID)
 }
 
 func (s *Service) recordAction(action operation.Action) {

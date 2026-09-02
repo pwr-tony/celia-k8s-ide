@@ -65,6 +65,20 @@ func (a *Adapter) ScaleDeployment(ctx context.Context, namespace, name string, r
 	return nil
 }
 
+func (a *Adapter) GetDeploymentReplicas(ctx context.Context, namespace, name string) (int32, error) {
+	clientset, err := a.getClientset()
+	if err != nil {
+		return 0, err
+	}
+
+	scale, err := clientset.AppsV1().Deployments(namespace).GetScale(ctx, name, metav1.GetOptions{})
+	if err != nil {
+		return 0, fmt.Errorf("failed to get deployment scale: %w", err)
+	}
+
+	return scale.Spec.Replicas, nil
+}
+
 func (a *Adapter) RolloutRestart(ctx context.Context, kind resource.Kind, namespace, name string) error {
 	clientset, err := a.getClientset()
 	if err != nil {

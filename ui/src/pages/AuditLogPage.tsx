@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useActionHistory } from '@/api/hooks/useOperations'
+import { useActionHistory, useUndoAction } from '@/api/hooks/useOperations'
 import { Button } from '@/components/primitives'
 import {
   Loader2,
@@ -13,6 +13,7 @@ import {
   FileEdit,
   Download,
   Filter,
+  Undo2,
 } from 'lucide-react'
 import type { Action } from '@/api/schemas'
 
@@ -52,11 +53,18 @@ function formatRelativeTime(timestamp: string): string {
   return new Date(timestamp).toLocaleDateString()
 }
 
-function ActionRow({ action }: { action: Action }) {
+interface ActionRowProps {
+  action: Action
+  onUndo: (actionId: string) => void
+  isUndoing: boolean
+}
+
+function ActionRow({ action, onUndo, isUndoing }: ActionRowProps) {
   const [expanded, setExpanded] = useState(false)
   const Icon = actionTypeIcons[action.type] || FileEdit
   const iconColor = actionTypeColors[action.type] || 'text-text-secondary'
   const isSuccess = action.status === 'success' || action.status === 'completed'
+  const isUndone = Boolean(action.undone_by)
 
   return (
     <div className="border-b border-border-subtle last:border-b-0">
@@ -64,7 +72,7 @@ function ActionRow({ action }: { action: Action }) {
         onClick={() => setExpanded(!expanded)}
         className="w-full px-4 py-3 flex items-center gap-4 hover:bg-bg-tertiary transition-colors text-left"
       >
-        <div className={`h-8 w-8 rounded-full flex items-center justify-center ${isSuccess ? 'bg-success/10' : 'bg-error/10'}`}>
+        <div className={`h-8 w-8 rounded-full flex items-center justify-center ${isSuccess ? 'bg-success/10' : 'bg-error/10'} ${isUndone ? 'opacity-50' : ''}`}>
           {isSuccess ? (
             <CheckCircle2 className="h-4 w-4 text-success" />
           ) : (
@@ -72,21 +80,45 @@ function ActionRow({ action }: { action: Action }) {
           )}
         </div>
 
-        <div className="flex-1 min-w-0">
+        <div className={`flex-1 min-w-0 ${isUndone ? 'opacity-50' : ''}`}>
           <div className="flex items-center gap-2">
             <Icon className={`h-4 w-4 ${iconColor}`} />
             <span className="font-medium capitalize">{action.type}</span>
             <span className="text-text-tertiary">•</span>
             <span className="text-text-secondary">{action.resource_kind}</span>
+            {isUndone && (
+              <span className="text-xs px-1.5 py-0.5 rounded bg-warning/10 text-warning">Undone</span>
+            )}
           </div>
           <p className="text-sm text-text-tertiary truncate">
             {action.namespace}/{action.resource_name}
           </p>
         </div>
 
-        <div className="text-right shrink-0">
-          <p className="text-sm text-text-secondary">{formatRelativeTime(action.started_at)}</p>
-          <p className="text-xs text-text-tertiary">{action.status}</p>
+        <div className="flex items-center gap-3">
+          {action.can_undo && !isUndone && (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation()
+                onUndo(action.id)
+              }}
+              disabled={isUndoing}
+              className="shrink-0"
+            >
+              {isUndoing ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Undo2 className="h-3.5 w-3.5" />
+              )}
+              <span className="ml-1">Undo</span>
+            </Button>
+          )}
+          <div className="text-right shrink-0">
+            <p className="text-sm text-text-secondary">{formatRelativeTime(action.started_at)}</p>
+            <p className="text-xs text-text-tertiary">{action.status}</p>
+          </div>
         </div>
       </button>
 
@@ -115,6 +147,12 @@ function ActionRow({ action }: { action: Action }) {
                 <p>{action.message}</p>
               </div>
             )}
+            {action.undone_by && (
+              <div className="col-span-2">
+                <p className="text-text-tertiary">Undone By</p>
+                <p className="font-mono text-xs">{action.undone_by}</p>
+              </div>
+            )}
             {Object.keys(action.parameters).length > 0 && (
               <div className="col-span-2">
                 <p className="text-text-tertiary mb-1">Parameters</p>
@@ -133,13 +171,25 @@ function ActionRow({ action }: { action: Action }) {
 export function AuditLogPage() {
   const [limit, setLimit] = useState(50)
   const [typeFilter, setTypeFilter] = useState<string>('')
+  const [undoingId, setUndoingId] = useState<string | null>(null)
   const { data, isLoading, refetch, isFetching } = useActionHistory(limit)
+  const undoMutation = useUndoAction()
 
   const filteredActions = data?.actions.filter((action) =>
     typeFilter ? action.type === typeFilter : true
   ) ?? []
 
   const actionTypes = [...new Set(data?.actions.map((a) => a.type) ?? [])]
+
+  const handleUndo = (actionId: string) => {
+    setUndoingId(actionId)
+    undoMutation.mutate(
+      { actionId },
+      {
+        onSettled: () => setUndoingId(null),
+      }
+    )
+  }
 
   const handleExport = () => {
     if (!data?.actions) return
@@ -232,7 +282,12 @@ export function AuditLogPage() {
           ) : (
             <div className="rounded-lg border border-border-subtle bg-bg-secondary overflow-hidden">
               {filteredActions.map((action) => (
-                <ActionRow key={action.id} action={action} />
+                <ActionRow
+                  key={action.id}
+                  action={action}
+                  onUndo={handleUndo}
+                  isUndoing={undoingId === action.id}
+                />
               ))}
             </div>
           )}

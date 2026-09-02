@@ -31,9 +31,20 @@ export const ActionSchema = z.object({
   resource_name: z.string(),
   status: z.string(),
   message: z.string(),
+  error: z.string().optional(),
   parameters: z.record(z.string(), z.unknown()),
+  created_at: z.string(),
   started_at: z.string(),
   completed_at: z.string(),
+  undone_by: z.string().optional(),
+  can_undo: z.boolean(),
+})
+
+export const UndoResultSchema = z.object({
+  action_id: z.string(),
+  success: z.boolean(),
+  message: z.string(),
+  undo_action_id: z.string(),
 })
 
 export const ActionHistoryResponseSchema = z.object({
@@ -45,3 +56,4 @@ export type OperationResult = z.infer<typeof OperationResultSchema>
 export type PurgeResult = z.infer<typeof PurgeResultSchema>
 export type Action = z.infer<typeof ActionSchema>
 export type ActionHistoryResponse = z.infer<typeof ActionHistoryResponseSchema>
+export type UndoResult = z.infer<typeof UndoResultSchema>

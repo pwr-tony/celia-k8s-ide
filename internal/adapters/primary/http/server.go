@@ -125,6 +125,8 @@ func (s *Server) setupRouter() http.Handler {
 	mux.HandleFunc("DELETE /api/v1/operations/pods/{namespace}/{name}", operationHandler.DeletePod)
 	mux.HandleFunc("POST /api/v1/operations/purge", operationHandler.PurgePods)
 	mux.HandleFunc("GET /api/v1/operations/history", operationHandler.GetActionHistory)
+	mux.HandleFunc("GET /api/v1/operations/{id}", operationHandler.GetAction)
+	mux.HandleFunc("POST /api/v1/operations/{id}/undo", operationHandler.UndoAction)
 
 	wsHandler := handlers.NewWSHandler(s.observabilityService, s.troubleService, s.log)
 	mux.HandleFunc("GET /api/v1/ws", wsHandler.HandleWebSocket)

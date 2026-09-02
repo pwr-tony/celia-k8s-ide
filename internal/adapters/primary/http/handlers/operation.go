@@ -114,6 +114,23 @@ func (h *OperationHandler) PurgePods(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, result)
 }
 
+type actionResponse struct {
+	ID           string                 `json:"id"`
+	Type         string                 `json:"type"`
+	Status       string                 `json:"status"`
+	ResourceKind string                 `json:"resource_kind"`
+	Namespace    string                 `json:"namespace"`
+	ResourceName string                 `json:"resource_name"`
+	Parameters   map[string]interface{} `json:"parameters"`
+	CreatedAt    string                 `json:"created_at"`
+	StartedAt    string                 `json:"started_at"`
+	CompletedAt  string                 `json:"completed_at"`
+	Message      string                 `json:"message"`
+	Error        string                 `json:"error,omitempty"`
+	UndoneBy     string                 `json:"undone_by,omitempty"`
+	CanUndo      bool                   `json:"can_undo"`
+}
+
 func (h *OperationHandler) GetActionHistory(w http.ResponseWriter, r *http.Request) {
 	limit := 50
 	if l := r.URL.Query().Get("limit"); l != "" {
@@ -129,8 +146,76 @@ func (h *OperationHandler) GetActionHistory(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
+	response := make([]actionResponse, len(actions))
+	for i, a := range actions {
+		startedAt := ""
+		if a.StartedAt != nil {
+			startedAt = a.StartedAt.Format("2006-01-02T15:04:05Z07:00")
+		}
+		completedAt := ""
+		if a.CompletedAt != nil {
+			completedAt = a.CompletedAt.Format("2006-01-02T15:04:05Z07:00")
+		}
+		response[i] = actionResponse{
+			ID:           a.ID,
+			Type:         string(a.Type),
+			Status:       string(a.Status),
+			ResourceKind: a.ResourceKind,
+			Namespace:    a.Namespace,
+			ResourceName: a.ResourceName,
+			Parameters:   a.Parameters,
+			CreatedAt:    a.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+			StartedAt:    startedAt,
+			CompletedAt:  completedAt,
+			Message:      a.Message,
+			Error:        a.Error,
+			UndoneBy:     a.UndoneBy,
+			CanUndo:      a.CanUndo(),
+		}
+	}
+
 	writeJSON(w, http.StatusOK, map[string]interface{}{
-		"count":   len(actions),
-		"actions": actions,
+		"count":   len(response),
+		"actions": response,
+	})
+}
+
+func (h *OperationHandler) GetAction(w http.ResponseWriter, r *http.Request) {
+	actionID := r.PathValue("id")
+
+	action, err := h.service.GetAction(r.Context(), actionID)
+	if err != nil {
+		writeError(w, http.StatusNotFound, err.Error())
+		return
+	}
+
+	writeJSON(w, http.StatusOK, action)
+}
+
+func (h *OperationHandler) UndoAction(w http.ResponseWriter, r *http.Request) {
+	actionID := r.PathValue("id")
+
+	action, err := h.service.GetAction(r.Context(), actionID)
+	if err != nil {
+		writeError(w, http.StatusNotFound, err.Error())
+		return
+	}
+
+	if !action.CanUndo() {
+		writeError(w, http.StatusBadRequest, "Action cannot be undone")
+		return
+	}
+
+	result, err := h.service.UndoAction(r.Context(), actionID)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	writeJSON(w, http.StatusOK, map[string]interface{}{
+		"action_id":      result.ActionID,
+		"success":        result.Success,
+		"message":        result.Message,
+		"undo_action_id": actionID,
 	})
 }

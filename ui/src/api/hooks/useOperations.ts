@@ -4,9 +4,11 @@ import {
   OperationResultSchema,
   PurgeResultSchema,
   ActionHistoryResponseSchema,
+  UndoResultSchema,
   type OperationResult,
   type PurgeResult,
   type ActionHistoryResponse,
+  type UndoResult,
 } from '../schemas'
 import { resourceKeys } from './useResources'
 
@@ -100,6 +102,19 @@ export function usePurgePods() {
       post<PurgeResult>('/operations/purge', { namespace, states }, PurgeResultSchema),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: resourceKeys.pods() })
+      queryClient.invalidateQueries({ queryKey: operationKeys.history() })
+    },
+  })
+}
+
+export function useUndoAction() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ actionId }: { actionId: string }) =>
+      post<UndoResult>(`/operations/${actionId}/undo`, {}, UndoResultSchema),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: resourceKeys.all })
       queryClient.invalidateQueries({ queryKey: operationKeys.history() })
     },
   })
