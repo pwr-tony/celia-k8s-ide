@@ -15,6 +15,7 @@ import { SecretListPage } from '@/pages/secrets/SecretListPage'
 import { SecretDetailPage } from '@/pages/secrets/SecretDetailPage'
 import { NodeListPage } from '@/pages/nodes/NodeListPage'
 import { NodeDetailPage } from '@/pages/nodes/NodeDetailPage'
+import { AuditLogPage } from '@/pages/AuditLogPage'
 
 const router = createBrowserRouter([
   {
@@ -35,6 +36,7 @@ const router = createBrowserRouter([
       { path: ROUTES.SECRET_DETAIL, element: <SecretDetailPage /> },
       { path: ROUTES.NODES, element: <NodeListPage /> },
       { path: ROUTES.NODE_DETAIL, element: <NodeDetailPage /> },
+      { path: ROUTES.AUDIT_LOG, element: <AuditLogPage /> },
       { path: '*', element: <NotFound /> },
     ],
   },

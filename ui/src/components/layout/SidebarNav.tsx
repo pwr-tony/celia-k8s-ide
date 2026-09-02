@@ -23,6 +23,7 @@ import {
   Folder,
   ScrollText,
   Stethoscope,
+  ClipboardList,
 } from 'lucide-react'
 
 export function SidebarNav() {
@@ -155,6 +156,11 @@ export function SidebarNav() {
               icon={FileText}
               label="Logs"
               resourceType="logs"
+            />
+            <NavItem
+              icon={ClipboardList}
+              label="Audit Log"
+              resourceType="audit"
             />
           </CategoryGroup>
 

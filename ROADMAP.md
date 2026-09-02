@@ -65,7 +65,7 @@
 - [x] Custom severity thresholds configuration
 - [x] Problem notifications (in-app)
 
-## Phase 4: Operations (80% Complete)
+## Phase 4: Operations (95% Complete)
 
 - [x] Scale deployment (API hook ready)
 - [x] Rollout restart (API hook ready)
@@ -75,9 +75,9 @@
 - [x] Operation confirmation dialogs with details
 - [x] Grace period option for delete
 - [x] Edit YAML and apply (kubectl edit style)
+- [x] Audit log viewer in UI
+- [x] Export audit log
 - [ ] Undo recent operations (where possible)
-- [ ] Audit log viewer in UI
-- [ ] Export audit log
 
 ## Phase 5: Polish & UX (30% Complete)
 

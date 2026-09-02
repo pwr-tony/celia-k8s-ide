@@ -12,6 +12,7 @@ export const ROUTES = {
   SECRET_DETAIL: '/secrets/:namespace/:name',
   NODES: '/nodes',
   NODE_DETAIL: '/nodes/:name',
+  AUDIT_LOG: '/audit',
 } as const
 
 export function podDetailPath(namespace: string, name: string): string {
@@ -66,4 +67,5 @@ export const RESOURCE_TO_ROUTE: Record<string, string> = {
   configmaps: ROUTES.CONFIGMAPS,
   secrets: ROUTES.SECRETS,
   nodes: ROUTES.NODES,
+  audit: ROUTES.AUDIT_LOG,
 }
