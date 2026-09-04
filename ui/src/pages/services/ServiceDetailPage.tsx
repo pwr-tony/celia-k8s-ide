@@ -1,9 +1,9 @@
 import { useParams } from 'react-router'
 import { useService } from '@/api/hooks'
 import { ResourceDetailLayout, ResourceYAMLTab, ResourceEventsTab } from '@/components/domain/ResourceDetail'
-import { getServiceType } from '@/components/data'
+import { getServiceType, DetailPageSkeleton } from '@/components/data'
 import { ROUTES } from '@/router/routes'
-import { Loader2, Tag, Network } from 'lucide-react'
+import { Tag, Network } from 'lucide-react'
 import type { Service } from '@/api/schemas'
 
 function ServiceOverview({ service }: { service: Service }) {
@@ -110,11 +110,7 @@ export function ServiceDetailPage() {
   const { data: service, isLoading } = useService(namespace!, name!)
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-text-secondary" />
-      </div>
-    )
+    return <DetailPageSkeleton />
   }
 
   if (!service) {

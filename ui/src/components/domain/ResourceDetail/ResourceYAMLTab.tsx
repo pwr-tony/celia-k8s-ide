@@ -1,10 +1,11 @@
 import { useResourceYAML, useUpdateResource } from '@/api/hooks'
 import Editor, { type OnMount } from '@monaco-editor/react'
-import { Loader2, Copy, Check, Pencil, X, Save } from 'lucide-react'
+import { Copy, Check, Pencil, X, Save } from 'lucide-react'
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react'
 import { Button, Kbd } from '@/components/primitives'
 import { useKeyboardContext, useKeyboardEnabled } from '@/lib/keyboard'
 import { YAMLConfirmDialog } from './YAMLConfirmDialog'
+import { YAMLSkeleton } from '@/components/data'
 
 type MonacoEditor = Parameters<OnMount>[0]
 
@@ -112,11 +113,7 @@ export function ResourceYAMLTab({ kind, namespace, name }: ResourceYAMLTabProps)
   }, [isEditMode, enterEditMode, cancelEdit, handleCopy])
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin text-text-secondary" />
-      </div>
-    )
+    return <YAMLSkeleton />
   }
 
   if (error) {

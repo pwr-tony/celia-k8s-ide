@@ -1,8 +1,9 @@
 import { useParams } from 'react-router'
 import { useConfigMap } from '@/api/hooks'
 import { ResourceDetailLayout, ResourceYAMLTab } from '@/components/domain/ResourceDetail'
+import { DetailPageSkeleton } from '@/components/data'
 import { ROUTES } from '@/router/routes'
-import { Loader2, Tag, FileText } from 'lucide-react'
+import { Tag, FileText } from 'lucide-react'
 import type { ConfigMap } from '@/api/schemas'
 
 function ConfigMapOverview({ configMap }: { configMap: ConfigMap }) {
@@ -84,11 +85,7 @@ export function ConfigMapDetailPage() {
   const { data: configMap, isLoading } = useConfigMap(namespace!, name!)
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-text-secondary" />
-      </div>
-    )
+    return <DetailPageSkeleton />
   }
 
   if (!configMap) {

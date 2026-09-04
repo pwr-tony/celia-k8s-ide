@@ -2,9 +2,9 @@ import { useParams } from 'react-router'
 import { useNode } from '@/api/hooks'
 import { ResourceDetailLayout, ResourceYAMLTab, ResourceEventsTab } from '@/components/domain/ResourceDetail'
 import { NodeMetricsTab } from '@/components/domain/nodes'
-import { getNodeStatus, StatusBadge } from '@/components/data'
+import { getNodeStatus, StatusBadge, DetailPageSkeleton } from '@/components/data'
 import { ROUTES } from '@/router/routes'
-import { Loader2, Tag, Server, Cpu, HardDrive } from 'lucide-react'
+import { Tag, Server, Cpu, HardDrive } from 'lucide-react'
 import type { Node } from '@/api/schemas'
 
 function NodeOverview({ node }: { node: Node }) {
@@ -209,11 +209,7 @@ export function NodeDetailPage() {
   const { data: node, isLoading } = useNode(name!)
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-text-secondary" />
-      </div>
-    )
+    return <DetailPageSkeleton />
   }
 
   if (!node) {

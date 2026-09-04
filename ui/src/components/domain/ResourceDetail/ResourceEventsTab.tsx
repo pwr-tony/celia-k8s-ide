@@ -1,7 +1,8 @@
 import { useEvents } from '@/api/hooks'
 import { useMemo, useState } from 'react'
-import { AlertCircle, Info, AlertTriangle, Loader2, List, GitBranch } from 'lucide-react'
+import { AlertCircle, Info, AlertTriangle, List, GitBranch } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { EventsSkeleton } from '@/components/data'
 import type { Event } from '@/api/schemas'
 
 interface ResourceEventsTabProps {
@@ -108,11 +109,7 @@ export function ResourceEventsTab({ namespace, resourceName, resourceKind }: Res
   }, [data?.items, resourceName, resourceKind])
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin text-text-secondary" />
-      </div>
-    )
+    return <EventsSkeleton />
   }
 
   if (filteredEvents.length === 0) {

@@ -5,9 +5,9 @@ import { ResourceDetailLayout, ResourceYAMLTab, ResourceEventsTab } from '@/comp
 import { PodOverview, PodContainersTab, PodLogsTab, PodMetricsTab } from '@/components/domain/pods'
 import { DeletePodDialog } from '@/components/operations'
 import { Button, Kbd } from '@/components/primitives'
-import { getPodStatus } from '@/components/data'
+import { getPodStatus, DetailPageSkeleton } from '@/components/data'
 import { ROUTES } from '@/router/routes'
-import { Loader2, Trash2 } from 'lucide-react'
+import { Trash2 } from 'lucide-react'
 
 export function PodDetailPage() {
   const { namespace, name } = useParams<{ namespace: string; name: string }>()
@@ -35,11 +35,7 @@ export function PodDetailPage() {
   }, [openDelete])
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-text-secondary" />
-      </div>
-    )
+    return <DetailPageSkeleton />
   }
 
   if (!pod) {

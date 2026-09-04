@@ -1,8 +1,9 @@
 import { useParams } from 'react-router'
 import { useSecret } from '@/api/hooks'
 import { ResourceDetailLayout, ResourceYAMLTab } from '@/components/domain/ResourceDetail'
+import { DetailPageSkeleton } from '@/components/data'
 import { ROUTES } from '@/router/routes'
-import { Loader2, Tag, Lock, Eye, EyeOff } from 'lucide-react'
+import { Tag, Lock, Eye, EyeOff } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@/components/primitives'
 import type { Secret } from '@/api/schemas'
@@ -126,11 +127,7 @@ export function SecretDetailPage() {
   const { data: secret, isLoading } = useSecret(namespace!, name!)
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-text-secondary" />
-      </div>
-    )
+    return <DetailPageSkeleton />
   }
 
   if (!secret) {

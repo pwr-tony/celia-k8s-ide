@@ -4,9 +4,9 @@ import { useDeployment } from '@/api/hooks'
 import { ResourceDetailLayout, ResourceYAMLTab, ResourceEventsTab } from '@/components/domain/ResourceDetail'
 import { ScaleDialog, RestartDialog } from '@/components/operations'
 import { Button, Kbd } from '@/components/primitives'
-import { getDeploymentStatus, StatusBadge } from '@/components/data'
+import { getDeploymentStatus, StatusBadge, DetailPageSkeleton } from '@/components/data'
 import { ROUTES } from '@/router/routes'
-import { Loader2, Tag, ArrowUpDown, RefreshCw } from 'lucide-react'
+import { Tag, ArrowUpDown, RefreshCw } from 'lucide-react'
 import type { Deployment } from '@/api/schemas'
 
 function DeploymentOverview({ deployment }: { deployment: Deployment }) {
@@ -146,11 +146,7 @@ export function DeploymentDetailPage() {
   }, [openScale, openRestart])
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-text-secondary" />
-      </div>
-    )
+    return <DetailPageSkeleton />
   }
 
   if (!deployment) {

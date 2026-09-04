@@ -10,8 +10,9 @@ import {
 } from '@tanstack/react-table'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { cn } from '@/lib/utils'
-import { Search, ArrowUpDown, ArrowUp, ArrowDown, Loader2 } from 'lucide-react'
+import { Search, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react'
 import { useTableKeyboardNav } from '@/hooks'
+import { TableSkeleton } from './TableSkeleton'
 
 interface ResourceTableProps<T> {
   data: T[]
@@ -110,11 +111,7 @@ export function ResourceTable<T>({
   }, [columnSizingInfo])
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin text-text-secondary" />
-      </div>
-    )
+    return <TableSkeleton columns={columns.length} />
   }
 
   return (
