@@ -79,13 +79,13 @@
 - [x] Export audit log
 - [x] Undo recent operations (where possible)
 
-## Phase 5: Polish & UX (30% Complete)
+## Phase 5: Polish & UX (50% Complete)
 
 - [x] Dark/light/system theme (persisted)
 - [x] Sidebar collapse state (persisted)
 - [x] Virtualized lists for 1000+ items
-- [ ] Keyboard shortcuts (vim-style navigation)
-- [ ] Global search (Cmd+K)
+- [x] Keyboard shortcuts (vim-style navigation)
+- [x] Global search (Cmd+K)
 - [ ] Loading states and skeletons
 - [ ] Empty states with helpful messages
 - [ ] Error boundaries and recovery

@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useParams } from 'react-router'
 import { useDeployment } from '@/api/hooks'
 import { ResourceDetailLayout, ResourceYAMLTab, ResourceEventsTab } from '@/components/domain/ResourceDetail'
 import { ScaleDialog, RestartDialog } from '@/components/operations'
-import { Button } from '@/components/primitives'
+import { Button, Kbd } from '@/components/primitives'
 import { getDeploymentStatus, StatusBadge } from '@/components/data'
 import { ROUTES } from '@/router/routes'
 import { Loader2, Tag, ArrowUpDown, RefreshCw } from 'lucide-react'
@@ -119,6 +119,32 @@ export function DeploymentDetailPage() {
   const [showScale, setShowScale] = useState(false)
   const [showRestart, setShowRestart] = useState(false)
 
+  const openScale = useCallback(() => setShowScale(true), [])
+  const openRestart = useCallback(() => setShowRestart(true), [])
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement
+      const isInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable
+
+      if (isInput || e.metaKey || e.ctrlKey || e.altKey) return
+
+      switch (e.key.toLowerCase()) {
+        case 's':
+          e.preventDefault()
+          openScale()
+          break
+        case 'r':
+          e.preventDefault()
+          openRestart()
+          break
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [openScale, openRestart])
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -143,13 +169,15 @@ export function DeploymentDetailPage() {
 
   const actions = (
     <div className="flex items-center gap-2">
-      <Button variant="secondary" size="sm" onClick={() => setShowScale(true)}>
+      <Button variant="secondary" size="sm" onClick={openScale}>
         <ArrowUpDown className="h-4 w-4 mr-1" />
         Scale
+        <Kbd className="ml-2">S</Kbd>
       </Button>
-      <Button variant="secondary" size="sm" onClick={() => setShowRestart(true)}>
+      <Button variant="secondary" size="sm" onClick={openRestart}>
         <RefreshCw className="h-4 w-4 mr-1" />
         Restart
+        <Kbd className="ml-2">R</Kbd>
       </Button>
     </div>
   )

@@ -35,7 +35,9 @@ const shortcutGroups: ShortcutGroup[] = [
       { keys: <><Kbd>G</Kbd><Kbd>C</Kbd></>, description: 'Go to ConfigMaps' },
       { keys: <><Kbd>G</Kbd><Kbd>X</Kbd></>, description: 'Go to Secrets' },
       { keys: <><Kbd>G</Kbd><Kbd>N</Kbd></>, description: 'Go to Nodes' },
+      { keys: <><Kbd>G</Kbd><Kbd>A</Kbd></>, description: 'Go to Audit Log' },
       { keys: <><Kbd>G</Kbd><Kbd>H</Kbd></>, description: 'Go to Dashboard' },
+      { keys: <Kbd>Backspace</Kbd>, description: 'Go Back' },
     ],
   },
   {
@@ -55,6 +57,14 @@ const shortcutGroups: ShortcutGroup[] = [
       { keys: <Kbd>Y</Kbd>, description: 'Copy YAML' },
       { keys: <Kbd>E</Kbd>, description: 'Edit YAML' },
       { keys: <><Kbd>{'\u2318'}</Kbd><Kbd>S</Kbd></>, description: 'Save Changes' },
+    ],
+  },
+  {
+    title: 'Resource Actions',
+    shortcuts: [
+      { keys: <Kbd>S</Kbd>, description: 'Scale (Deployments)' },
+      { keys: <Kbd>R</Kbd>, description: 'Restart (Deployments)' },
+      { keys: <Kbd>X</Kbd>, description: 'Delete (Pods)' },
     ],
   },
 ]

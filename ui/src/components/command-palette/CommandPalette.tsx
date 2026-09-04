@@ -93,6 +93,23 @@ export function CommandPalette() {
     execute: () => navigate(ROUTES.DASHBOARD),
   })
 
+  useRegisterCommand({
+    id: 'navigate.audit',
+    label: 'Go to Audit Log',
+    chord: { keys: ['g', 'a'] },
+    contexts: ['global'],
+    execute: () => navigate(ROUTES.AUDIT_LOG),
+  })
+
+  useRegisterCommand({
+    id: 'navigate.back',
+    label: 'Go Back',
+    keybinding: { key: 'Backspace', modifiers: [] },
+    contexts: ['global', 'detail'],
+    hidden: true,
+    execute: () => navigate(-1),
+  })
+
   const visibleCommands = useMemo(() => {
     return commandRegistry.getVisible()
   }, [])
