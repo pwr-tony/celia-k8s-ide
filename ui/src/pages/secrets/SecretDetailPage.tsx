@@ -1,7 +1,8 @@
 import { useParams } from 'react-router'
 import { useSecret } from '@/api/hooks'
 import { ResourceDetailLayout, ResourceYAMLTab } from '@/components/domain/ResourceDetail'
-import { DetailPageSkeleton } from '@/components/data'
+import { DetailPageSkeleton, EmptyState } from '@/components/data'
+import { PageError } from '@/components/error'
 import { ROUTES } from '@/router/routes'
 import { Tag, Lock, Eye, EyeOff } from 'lucide-react'
 import { useState } from 'react'
@@ -124,16 +125,24 @@ function SecretDataTab({ secret }: { secret: Secret }) {
 
 export function SecretDetailPage() {
   const { namespace, name } = useParams<{ namespace: string; name: string }>()
-  const { data: secret, isLoading } = useSecret(namespace!, name!)
+  const { data: secret, isLoading, error, refetch } = useSecret(namespace!, name!)
 
   if (isLoading) {
     return <DetailPageSkeleton />
   }
 
+  if (error) {
+    return <PageError error={error as Error} onRetry={() => refetch()} />
+  }
+
   if (!secret) {
     return (
-      <div className="flex items-center justify-center h-screen text-text-secondary">
-        Secret not found
+      <div className="flex-1 flex items-center justify-center">
+        <EmptyState
+          icon={Lock}
+          title="Secret not found"
+          description={`The secret "${name}" was not found in namespace "${namespace}".`}
+        />
       </div>
     )
   }

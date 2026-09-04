@@ -79,7 +79,7 @@
 - [x] Export audit log
 - [x] Undo recent operations (where possible)
 
-## Phase 5: Polish & UX (70% Complete)
+## Phase 5: Polish & UX (80% Complete)
 
 - [x] Dark/light/system theme (persisted)
 - [x] Sidebar collapse state (persisted)
@@ -88,7 +88,7 @@
 - [x] Global search (Cmd+K)
 - [x] Loading states and skeletons
 - [x] Empty states with helpful messages
-- [ ] Error boundaries and recovery
+- [x] Error boundaries and recovery
 - [ ] Responsive layout
 - [ ] Fedora RPM packaging
 

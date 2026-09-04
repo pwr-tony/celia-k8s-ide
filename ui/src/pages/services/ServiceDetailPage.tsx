@@ -1,9 +1,10 @@
 import { useParams } from 'react-router'
 import { useService } from '@/api/hooks'
 import { ResourceDetailLayout, ResourceYAMLTab, ResourceEventsTab } from '@/components/domain/ResourceDetail'
-import { getServiceType, DetailPageSkeleton } from '@/components/data'
+import { getServiceType, DetailPageSkeleton, EmptyState } from '@/components/data'
+import { PageError } from '@/components/error'
 import { ROUTES } from '@/router/routes'
-import { Tag, Network } from 'lucide-react'
+import { Tag, Network, Globe } from 'lucide-react'
 import type { Service } from '@/api/schemas'
 
 function ServiceOverview({ service }: { service: Service }) {
@@ -107,16 +108,24 @@ function ServiceOverview({ service }: { service: Service }) {
 
 export function ServiceDetailPage() {
   const { namespace, name } = useParams<{ namespace: string; name: string }>()
-  const { data: service, isLoading } = useService(namespace!, name!)
+  const { data: service, isLoading, error, refetch } = useService(namespace!, name!)
 
   if (isLoading) {
     return <DetailPageSkeleton />
   }
 
+  if (error) {
+    return <PageError error={error as Error} onRetry={() => refetch()} />
+  }
+
   if (!service) {
     return (
-      <div className="flex items-center justify-center h-screen text-text-secondary">
-        Service not found
+      <div className="flex-1 flex items-center justify-center">
+        <EmptyState
+          icon={Globe}
+          title="Service not found"
+          description={`The service "${name}" was not found in namespace "${namespace}".`}
+        />
       </div>
     )
   }

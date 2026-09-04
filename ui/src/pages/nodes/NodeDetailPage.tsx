@@ -2,7 +2,8 @@ import { useParams } from 'react-router'
 import { useNode } from '@/api/hooks'
 import { ResourceDetailLayout, ResourceYAMLTab, ResourceEventsTab } from '@/components/domain/ResourceDetail'
 import { NodeMetricsTab } from '@/components/domain/nodes'
-import { getNodeStatus, StatusBadge, DetailPageSkeleton } from '@/components/data'
+import { getNodeStatus, StatusBadge, DetailPageSkeleton, EmptyState } from '@/components/data'
+import { PageError } from '@/components/error'
 import { ROUTES } from '@/router/routes'
 import { Tag, Server, Cpu, HardDrive } from 'lucide-react'
 import type { Node } from '@/api/schemas'
@@ -206,16 +207,24 @@ function NodeOverview({ node }: { node: Node }) {
 
 export function NodeDetailPage() {
   const { name } = useParams<{ name: string }>()
-  const { data: node, isLoading } = useNode(name!)
+  const { data: node, isLoading, error, refetch } = useNode(name!)
 
   if (isLoading) {
     return <DetailPageSkeleton />
   }
 
+  if (error) {
+    return <PageError error={error as Error} onRetry={() => refetch()} />
+  }
+
   if (!node) {
     return (
-      <div className="flex items-center justify-center h-screen text-text-secondary">
-        Node not found
+      <div className="flex-1 flex items-center justify-center">
+        <EmptyState
+          icon={Server}
+          title="Node not found"
+          description={`The node "${name}" was not found. It may have been removed from the cluster.`}
+        />
       </div>
     )
   }

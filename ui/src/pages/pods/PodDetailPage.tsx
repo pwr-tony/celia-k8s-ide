@@ -5,13 +5,14 @@ import { ResourceDetailLayout, ResourceYAMLTab, ResourceEventsTab } from '@/comp
 import { PodOverview, PodContainersTab, PodLogsTab, PodMetricsTab } from '@/components/domain/pods'
 import { DeletePodDialog } from '@/components/operations'
 import { Button, Kbd } from '@/components/primitives'
-import { getPodStatus, DetailPageSkeleton } from '@/components/data'
+import { getPodStatus, DetailPageSkeleton, EmptyState } from '@/components/data'
+import { PageError } from '@/components/error'
 import { ROUTES } from '@/router/routes'
-import { Trash2 } from 'lucide-react'
+import { Trash2, Box } from 'lucide-react'
 
 export function PodDetailPage() {
   const { namespace, name } = useParams<{ namespace: string; name: string }>()
-  const { data: pod, isLoading } = usePod(namespace!, name!)
+  const { data: pod, isLoading, error, refetch } = usePod(namespace!, name!)
   const [showDelete, setShowDelete] = useState(false)
   const navigate = useNavigate()
 
@@ -38,10 +39,18 @@ export function PodDetailPage() {
     return <DetailPageSkeleton />
   }
 
+  if (error) {
+    return <PageError error={error as Error} onRetry={() => refetch()} />
+  }
+
   if (!pod) {
     return (
-      <div className="flex items-center justify-center h-screen text-text-secondary">
-        Pod not found
+      <div className="flex-1 flex items-center justify-center">
+        <EmptyState
+          icon={Box}
+          title="Pod not found"
+          description={`The pod "${name}" was not found in namespace "${namespace}". It may have been deleted or completed.`}
+        />
       </div>
     )
   }

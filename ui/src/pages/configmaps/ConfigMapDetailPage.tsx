@@ -1,7 +1,8 @@
 import { useParams } from 'react-router'
 import { useConfigMap } from '@/api/hooks'
 import { ResourceDetailLayout, ResourceYAMLTab } from '@/components/domain/ResourceDetail'
-import { DetailPageSkeleton } from '@/components/data'
+import { DetailPageSkeleton, EmptyState } from '@/components/data'
+import { PageError } from '@/components/error'
 import { ROUTES } from '@/router/routes'
 import { Tag, FileText } from 'lucide-react'
 import type { ConfigMap } from '@/api/schemas'
@@ -82,16 +83,24 @@ function ConfigMapDataTab({ configMap }: { configMap: ConfigMap }) {
 
 export function ConfigMapDetailPage() {
   const { namespace, name } = useParams<{ namespace: string; name: string }>()
-  const { data: configMap, isLoading } = useConfigMap(namespace!, name!)
+  const { data: configMap, isLoading, error, refetch } = useConfigMap(namespace!, name!)
 
   if (isLoading) {
     return <DetailPageSkeleton />
   }
 
+  if (error) {
+    return <PageError error={error as Error} onRetry={() => refetch()} />
+  }
+
   if (!configMap) {
     return (
-      <div className="flex items-center justify-center h-screen text-text-secondary">
-        ConfigMap not found
+      <div className="flex-1 flex items-center justify-center">
+        <EmptyState
+          icon={FileText}
+          title="ConfigMap not found"
+          description={`The configmap "${name}" was not found in namespace "${namespace}".`}
+        />
       </div>
     )
   }

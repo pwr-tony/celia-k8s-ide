@@ -4,9 +4,10 @@ import { useDeployment } from '@/api/hooks'
 import { ResourceDetailLayout, ResourceYAMLTab, ResourceEventsTab } from '@/components/domain/ResourceDetail'
 import { ScaleDialog, RestartDialog } from '@/components/operations'
 import { Button, Kbd } from '@/components/primitives'
-import { getDeploymentStatus, StatusBadge, DetailPageSkeleton } from '@/components/data'
+import { getDeploymentStatus, StatusBadge, DetailPageSkeleton, EmptyState } from '@/components/data'
+import { PageError } from '@/components/error'
 import { ROUTES } from '@/router/routes'
-import { Tag, ArrowUpDown, RefreshCw } from 'lucide-react'
+import { Tag, ArrowUpDown, RefreshCw, Server } from 'lucide-react'
 import type { Deployment } from '@/api/schemas'
 
 function DeploymentOverview({ deployment }: { deployment: Deployment }) {
@@ -115,7 +116,7 @@ function DeploymentOverview({ deployment }: { deployment: Deployment }) {
 
 export function DeploymentDetailPage() {
   const { namespace, name } = useParams<{ namespace: string; name: string }>()
-  const { data: deployment, isLoading } = useDeployment(namespace!, name!)
+  const { data: deployment, isLoading, error, refetch } = useDeployment(namespace!, name!)
   const [showScale, setShowScale] = useState(false)
   const [showRestart, setShowRestart] = useState(false)
 
@@ -149,10 +150,18 @@ export function DeploymentDetailPage() {
     return <DetailPageSkeleton />
   }
 
+  if (error) {
+    return <PageError error={error as Error} onRetry={() => refetch()} />
+  }
+
   if (!deployment) {
     return (
-      <div className="flex items-center justify-center h-screen text-text-secondary">
-        Deployment not found
+      <div className="flex-1 flex items-center justify-center">
+        <EmptyState
+          icon={Server}
+          title="Deployment not found"
+          description={`The deployment "${name}" was not found in namespace "${namespace}". It may have been deleted or you may not have access to it.`}
+        />
       </div>
     )
   }
