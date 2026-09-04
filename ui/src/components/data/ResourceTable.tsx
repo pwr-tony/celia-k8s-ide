@@ -10,9 +10,10 @@ import {
 } from '@tanstack/react-table'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { cn } from '@/lib/utils'
-import { Search, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react'
+import { Search, ArrowUpDown, ArrowUp, ArrowDown, X } from 'lucide-react'
 import { useTableKeyboardNav } from '@/hooks'
 import { TableSkeleton } from './TableSkeleton'
+import { ResourceEmptyState } from './EmptyState'
 
 interface ResourceTableProps<T> {
   data: T[]
@@ -22,6 +23,8 @@ interface ResourceTableProps<T> {
   onRowClick?: (row: T) => void
   searchPlaceholder?: string
   emptyMessage?: string
+  resourceType?: string
+  onRefresh?: () => void
 }
 
 export function ResourceTable<T>({
@@ -30,7 +33,8 @@ export function ResourceTable<T>({
   isLoading,
   onRowClick,
   searchPlaceholder = 'Search...',
-  emptyMessage = 'No resources found',
+  resourceType,
+  onRefresh,
 }: ResourceTableProps<T>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [globalFilter, setGlobalFilter] = useState('')
@@ -125,11 +129,23 @@ export function ResourceTable<T>({
             value={globalFilter}
             onChange={(e) => setGlobalFilter(e.target.value)}
             placeholder={searchPlaceholder}
-            className="w-full pl-9 pr-4 py-2 bg-bg-tertiary border border-border-subtle rounded-md text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-accent-primary focus:border-transparent"
+            className={cn(
+              'w-full pl-9 py-2 bg-bg-tertiary border border-border-subtle rounded-md text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-accent-primary focus:border-transparent',
+              globalFilter ? 'pr-8' : 'pr-4'
+            )}
           />
+          {globalFilter && (
+            <button
+              onClick={() => setGlobalFilter('')}
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-bg-hover rounded"
+            >
+              <X className="h-3 w-3 text-text-tertiary" />
+            </button>
+          )}
         </div>
         <span className="text-sm text-text-secondary">
           {rows.length} {rows.length === 1 ? 'item' : 'items'}
+          {globalFilter && data.length !== rows.length && ` (${data.length} total)`}
         </span>
       </div>
 
@@ -231,9 +247,12 @@ export function ResourceTable<T>({
         </table>
 
         {rows.length === 0 && (
-          <div className="flex items-center justify-center h-32 text-text-secondary">
-            {emptyMessage}
-          </div>
+          <ResourceEmptyState
+            resourceType={resourceType || 'resources'}
+            hasFilter={Boolean(globalFilter)}
+            onClearFilter={() => setGlobalFilter('')}
+            onRefresh={onRefresh}
+          />
         )}
       </div>
     </div>

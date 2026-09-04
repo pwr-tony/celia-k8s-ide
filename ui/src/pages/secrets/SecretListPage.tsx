@@ -7,7 +7,7 @@ import type { Secret } from '@/api/schemas'
 
 export function SecretListPage() {
   const namespace = useUIStore((s) => s.selectedNamespace)
-  const { data, isLoading } = useSecrets(namespace ?? undefined)
+  const { data, isLoading, refetch } = useSecrets(namespace ?? undefined)
   const navigate = useNavigate()
 
   const handleRowClick = (secret: Secret) => {
@@ -24,7 +24,8 @@ export function SecretListPage() {
           isLoading={isLoading}
           onRowClick={handleRowClick}
           searchPlaceholder="Search secrets..."
-          emptyMessage="No secrets found"
+          resourceType="secrets"
+          onRefresh={refetch}
         />
       </main>
     </>

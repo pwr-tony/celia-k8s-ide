@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useActionHistory, useUndoAction } from '@/api/hooks/useOperations'
 import { Button } from '@/components/primitives'
+import { EmptyState } from '@/components/data'
 import {
   Loader2,
   RefreshCw,
@@ -14,6 +15,7 @@ import {
   Download,
   Filter,
   Undo2,
+  ClipboardList,
 } from 'lucide-react'
 import type { Action } from '@/api/schemas'
 
@@ -272,12 +274,21 @@ export function AuditLogPage() {
               <Loader2 className="h-8 w-8 animate-spin text-text-tertiary" />
             </div>
           ) : filteredActions.length === 0 ? (
-            <div className="rounded-lg border border-border-subtle bg-bg-secondary p-12 text-center">
-              <Clock className="h-12 w-12 mx-auto mb-4 text-text-tertiary" />
-              <p className="text-text-secondary font-medium">No actions recorded</p>
-              <p className="text-sm text-text-tertiary mt-1">
-                Operations like scale, restart, and delete will appear here
-              </p>
+            <div className="rounded-lg border border-border-subtle bg-bg-secondary">
+              <EmptyState
+                icon={ClipboardList}
+                title={typeFilter ? 'No matching actions' : 'No actions recorded'}
+                description={
+                  typeFilter
+                    ? `No ${typeFilter} actions found. Try a different filter.`
+                    : 'Operations like scale, restart, and delete will appear here as you use them.'
+                }
+                action={
+                  typeFilter
+                    ? { label: 'Clear filter', onClick: () => setTypeFilter('') }
+                    : undefined
+                }
+              />
             </div>
           ) : (
             <div className="rounded-lg border border-border-subtle bg-bg-secondary overflow-hidden">

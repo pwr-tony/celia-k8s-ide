@@ -5,7 +5,7 @@ import { nodeDetailPath } from '@/router/routes'
 import type { Node } from '@/api/schemas'
 
 export function NodeListPage() {
-  const { data, isLoading } = useNodes()
+  const { data, isLoading, refetch } = useNodes()
   const navigate = useNavigate()
 
   const handleRowClick = (node: Node) => {
@@ -22,7 +22,8 @@ export function NodeListPage() {
           isLoading={isLoading}
           onRowClick={handleRowClick}
           searchPlaceholder="Search nodes..."
-          emptyMessage="No nodes found"
+          resourceType="nodes"
+          onRefresh={refetch}
         />
       </main>
     </>

@@ -1,8 +1,8 @@
 import { useEvents } from '@/api/hooks'
 import { useMemo, useState } from 'react'
-import { AlertCircle, Info, AlertTriangle, List, GitBranch } from 'lucide-react'
+import { AlertCircle, Info, AlertTriangle, List, GitBranch, ScrollText } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { EventsSkeleton } from '@/components/data'
+import { EventsSkeleton, EmptyState } from '@/components/data'
 import type { Event } from '@/api/schemas'
 
 interface ResourceEventsTabProps {
@@ -114,9 +114,12 @@ export function ResourceEventsTab({ namespace, resourceName, resourceKind }: Res
 
   if (filteredEvents.length === 0) {
     return (
-      <div className="flex items-center justify-center h-64 text-text-secondary">
-        No events found for this resource
-      </div>
+      <EmptyState
+        icon={ScrollText}
+        title="No events"
+        description="No recent events for this resource. Events appear when Kubernetes records important activities like container starts, scheduling decisions, or errors."
+        className="h-64"
+      />
     )
   }
 

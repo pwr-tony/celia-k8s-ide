@@ -7,7 +7,7 @@ import type { ConfigMap } from '@/api/schemas'
 
 export function ConfigMapListPage() {
   const namespace = useUIStore((s) => s.selectedNamespace)
-  const { data, isLoading } = useConfigMaps(namespace ?? undefined)
+  const { data, isLoading, refetch } = useConfigMaps(namespace ?? undefined)
   const navigate = useNavigate()
 
   const handleRowClick = (configMap: ConfigMap) => {
@@ -24,7 +24,8 @@ export function ConfigMapListPage() {
           isLoading={isLoading}
           onRowClick={handleRowClick}
           searchPlaceholder="Search configmaps..."
-          emptyMessage="No configmaps found"
+          resourceType="configmaps"
+          onRefresh={refetch}
         />
       </main>
     </>

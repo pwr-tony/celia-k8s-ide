@@ -7,7 +7,7 @@ import type { Pod } from '@/api/schemas'
 
 export function PodListPage() {
   const namespace = useUIStore((s) => s.selectedNamespace)
-  const { data, isLoading } = usePods(namespace ?? undefined)
+  const { data, isLoading, refetch } = usePods(namespace ?? undefined)
   const navigate = useNavigate()
 
   const handleRowClick = (pod: Pod) => {
@@ -24,7 +24,8 @@ export function PodListPage() {
           isLoading={isLoading}
           onRowClick={handleRowClick}
           searchPlaceholder="Search pods..."
-          emptyMessage="No pods found"
+          resourceType="pods"
+          onRefresh={refetch}
         />
       </main>
     </>

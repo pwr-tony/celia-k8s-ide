@@ -7,7 +7,7 @@ import type { Deployment } from '@/api/schemas'
 
 export function DeploymentListPage() {
   const namespace = useUIStore((s) => s.selectedNamespace)
-  const { data, isLoading } = useDeployments(namespace ?? undefined)
+  const { data, isLoading, refetch } = useDeployments(namespace ?? undefined)
   const navigate = useNavigate()
 
   const handleRowClick = (deployment: Deployment) => {
@@ -24,7 +24,8 @@ export function DeploymentListPage() {
           isLoading={isLoading}
           onRowClick={handleRowClick}
           searchPlaceholder="Search deployments..."
-          emptyMessage="No deployments found"
+          resourceType="deployments"
+          onRefresh={refetch}
         />
       </main>
     </>

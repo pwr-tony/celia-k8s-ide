@@ -7,7 +7,7 @@ import type { Service } from '@/api/schemas'
 
 export function ServiceListPage() {
   const namespace = useUIStore((s) => s.selectedNamespace)
-  const { data, isLoading } = useServices(namespace ?? undefined)
+  const { data, isLoading, refetch } = useServices(namespace ?? undefined)
   const navigate = useNavigate()
 
   const handleRowClick = (service: Service) => {
@@ -24,7 +24,8 @@ export function ServiceListPage() {
           isLoading={isLoading}
           onRowClick={handleRowClick}
           searchPlaceholder="Search services..."
-          emptyMessage="No services found"
+          resourceType="services"
+          onRefresh={refetch}
         />
       </main>
     </>
