@@ -1,0 +1,24 @@
+[Unit]
+Description=Celia Kubernetes Troubleshooting Server
+Documentation=https://github.com/tonymora/celia
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=celia
+Group=celia
+ExecStart=/usr/bin/celia-server
+Restart=on-failure
+RestartSec=5s
+
+Environment=CELIA_CONFIG=/etc/celia/config.yaml
+
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=read-only
+PrivateTmp=yes
+ReadWritePaths=/var/log/celia
+
+[Install]
+WantedBy=multi-user.target

@@ -39,12 +39,19 @@
     "externalBin": ["binaries/celia-server"],
     "linux": {
       "deb": {
-        "depends": []
+        "depends": ["libwebkit2gtk-4.1-0", "libgtk-3-0"],
+        "section": "devel",
+        "priority": "optional"
       },
       "rpm": {
-        "depends": []
+        "depends": ["webkit2gtk4.1", "gtk3"],
+        "license": "MIT",
+        "release": "1"
       }
-    }
+    },
+    "category": "Development",
+    "shortDescription": "Kubernetes troubleshooting and operations tool",
+    "longDescription": "Celia is a desktop application for Kubernetes troubleshooting and operations, designed for SREs and platform engineers. It automatically detects common cluster problems and provides actionable diagnosis."
   },
   "plugins": {
     "shell": {

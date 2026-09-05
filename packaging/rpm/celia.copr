@@ -1,0 +1,33 @@
+# COPR build configuration for Celia
+# https://copr.fedorainfracloud.org/
+
+[main]
+# Project name on COPR
+project = celia
+
+# Owner (your Fedora account username)
+owner = tonymora
+
+# Chroots to build for
+chroots = fedora-rawhide-x86_64 fedora-40-x86_64 fedora-39-x86_64
+
+# Build timeout in seconds
+timeout = 36000
+
+# Build dependencies
+builddeps = golang nodejs pnpm cargo rust webkit2gtk4.1-devel gtk3-devel
+
+# Source type: srpm, git, or url
+source_type = git
+
+# Git URL
+git_url = https://github.com/tonymora/celia.git
+
+# Git branch
+git_branch = main
+
+# Subdirectory containing the spec file
+git_dir = packaging/rpm
+
+# Spec file name
+spec = celia.spec

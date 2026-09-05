@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Celia
+Comment=Kubernetes troubleshooting and operations tool
+Exec=celia-server --ui
+Icon=celia
+Terminal=false
+Type=Application
+Categories=Development;System;
+Keywords=kubernetes;k8s;cluster;devops;sre;troubleshooting;
+StartupNotify=true
+StartupWMClass=celia

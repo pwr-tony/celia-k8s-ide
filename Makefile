@@ -1,4 +1,4 @@
-.PHONY: all build run test lint clean dev deps desktop-sidecar-linux desktop-sidecar-darwin desktop-sidecar-windows desktop-dev desktop-build
+.PHONY: all build run test lint clean dev deps desktop-sidecar-linux desktop-sidecar-darwin desktop-sidecar-windows desktop-dev desktop-build rpm rpm-deps
 
 BINARY_NAME=celia-server
 BUILD_DIR=./build
@@ -80,6 +80,19 @@ desktop-build: desktop-sidecar-linux
 	cd ui && pnpm build
 	cd desktop/src-tauri && cargo tauri build
 
+rpm-deps:
+	@echo "Installing RPM build dependencies..."
+	sudo dnf install -y rpm-build rpmdevtools golang nodejs pnpm
+
+rpm: deps
+	@echo "Building Fedora RPM package..."
+	./packaging/rpm/build-rpm.sh
+
+rpm-tauri: desktop-sidecar-linux
+	@echo "Building Tauri RPM package..."
+	cd ui && pnpm build
+	cd desktop/src-tauri && cargo tauri build --bundles rpm
+
 help:
 	@echo "Available targets:"
 	@echo "  all           - Build the application (default)"
@@ -102,3 +115,8 @@ help:
 	@echo "  desktop-sidecar-windows - Build Go sidecar for Windows"
 	@echo "  desktop-dev             - Run Tauri in development mode"
 	@echo "  desktop-build           - Build Tauri application for production"
+	@echo ""
+	@echo "Packaging targets:"
+	@echo "  rpm-deps                - Install RPM build dependencies (Fedora)"
+	@echo "  rpm                     - Build standalone RPM package"
+	@echo "  rpm-tauri               - Build Tauri desktop RPM package"
