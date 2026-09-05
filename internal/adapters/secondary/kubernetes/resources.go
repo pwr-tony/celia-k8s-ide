@@ -92,6 +92,28 @@ func (a *Adapter) ListResources(ctx context.Context, kind resource.Kind, namespa
 		}
 		return result, nil
 
+	case resource.KindPersistentVolume:
+		pvs, err := a.ListPersistentVolumes(ctx)
+		if err != nil {
+			return nil, err
+		}
+		result := make([]resource.Resource, len(pvs))
+		for i, pv := range pvs {
+			result[i] = pv.Resource
+		}
+		return result, nil
+
+	case resource.KindPersistentVolumeClaim:
+		pvcs, err := a.ListPersistentVolumeClaims(ctx, namespace)
+		if err != nil {
+			return nil, err
+		}
+		result := make([]resource.Resource, len(pvcs))
+		for i, pvc := range pvcs {
+			result[i] = pvc.Resource
+		}
+		return result, nil
+
 	default:
 		return nil, fmt.Errorf("unsupported resource kind: %s", kind)
 	}
@@ -140,6 +162,20 @@ func (a *Adapter) GetResource(ctx context.Context, kind resource.Kind, namespace
 			return nil, err
 		}
 		return &node.Resource, nil
+
+	case resource.KindPersistentVolume:
+		pv, err := a.GetPersistentVolume(ctx, name)
+		if err != nil {
+			return nil, err
+		}
+		return &pv.Resource, nil
+
+	case resource.KindPersistentVolumeClaim:
+		pvc, err := a.GetPersistentVolumeClaim(ctx, namespace, name)
+		if err != nil {
+			return nil, err
+		}
+		return &pvc.Resource, nil
 
 	default:
 		return nil, fmt.Errorf("unsupported resource kind: %s", kind)
@@ -327,6 +363,10 @@ func getGVR(kind resource.Kind) schema.GroupVersionResource {
 		return schema.GroupVersionResource{Group: "batch", Version: "v1", Resource: "jobs"}
 	case resource.KindCronJob:
 		return schema.GroupVersionResource{Group: "batch", Version: "v1", Resource: "cronjobs"}
+	case resource.KindPersistentVolume:
+		return schema.GroupVersionResource{Group: "", Version: "v1", Resource: "persistentvolumes"}
+	case resource.KindPersistentVolumeClaim:
+		return schema.GroupVersionResource{Group: "", Version: "v1", Resource: "persistentvolumeclaims"}
 	default:
 		return schema.GroupVersionResource{Group: "", Version: "v1", Resource: kind.Plural()}
 	}

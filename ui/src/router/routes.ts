@@ -12,6 +12,10 @@ export const ROUTES = {
   SECRET_DETAIL: '/secrets/:namespace/:name',
   NODES: '/nodes',
   NODE_DETAIL: '/nodes/:name',
+  PERSISTENT_VOLUMES: '/persistentvolumes',
+  PERSISTENT_VOLUME_DETAIL: '/persistentvolumes/:name',
+  PERSISTENT_VOLUME_CLAIMS: '/persistentvolumeclaims',
+  PERSISTENT_VOLUME_CLAIM_DETAIL: '/persistentvolumeclaims/:namespace/:name',
   AUDIT_LOG: '/audit',
 } as const
 
@@ -37,6 +41,14 @@ export function secretDetailPath(namespace: string, name: string): string {
 
 export function nodeDetailPath(name: string): string {
   return `/nodes/${encodeURIComponent(name)}`
+}
+
+export function pvDetailPath(name: string): string {
+  return `/persistentvolumes/${encodeURIComponent(name)}`
+}
+
+export function pvcDetailPath(namespace: string, name: string): string {
+  return `/persistentvolumeclaims/${encodeURIComponent(namespace)}/${encodeURIComponent(name)}`
 }
 
 export type ResourceType =
@@ -67,5 +79,7 @@ export const RESOURCE_TO_ROUTE: Record<string, string> = {
   configmaps: ROUTES.CONFIGMAPS,
   secrets: ROUTES.SECRETS,
   nodes: ROUTES.NODES,
+  persistentvolumes: ROUTES.PERSISTENT_VOLUMES,
+  persistentvolumeclaims: ROUTES.PERSISTENT_VOLUME_CLAIMS,
   audit: ROUTES.AUDIT_LOG,
 }

@@ -276,4 +276,51 @@ func (h *ResourceHandler) GetNode(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, node)
 }
 
+func (h *ResourceHandler) ListPersistentVolumes(w http.ResponseWriter, r *http.Request) {
+	pvs, err := h.service.ListPersistentVolumes(r.Context())
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	writeJSON(w, http.StatusOK, map[string]interface{}{"items": pvs, "count": len(pvs)})
+}
+
+func (h *ResourceHandler) GetPersistentVolume(w http.ResponseWriter, r *http.Request) {
+	name := r.PathValue("name")
+
+	pv, err := h.service.GetPersistentVolume(r.Context(), name)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	writeJSON(w, http.StatusOK, pv)
+}
+
+func (h *ResourceHandler) ListPersistentVolumeClaims(w http.ResponseWriter, r *http.Request) {
+	namespace := getQueryParam(r, "namespace", "")
+
+	pvcs, err := h.service.ListPersistentVolumeClaims(r.Context(), namespace)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	writeJSON(w, http.StatusOK, map[string]interface{}{"items": pvcs, "count": len(pvcs)})
+}
+
+func (h *ResourceHandler) GetPersistentVolumeClaim(w http.ResponseWriter, r *http.Request) {
+	namespace := r.PathValue("namespace")
+	name := r.PathValue("name")
+
+	pvc, err := h.service.GetPersistentVolumeClaim(r.Context(), namespace, name)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	writeJSON(w, http.StatusOK, pvc)
+}
+
 var _ = json.Marshal

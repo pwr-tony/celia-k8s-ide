@@ -9,6 +9,8 @@ import {
   ResourceYAMLSchema,
   ConfigMapsResponseSchema,
   SecretsResponseSchema,
+  PersistentVolumesResponseSchema,
+  PersistentVolumeClaimsResponseSchema,
   UpdateResourceResponseSchema,
   type PodsResponse,
   type DeploymentsResponse,
@@ -17,6 +19,8 @@ import {
   type EventsResponse,
   type ConfigMapsResponse,
   type SecretsResponse,
+  type PersistentVolumesResponse,
+  type PersistentVolumeClaimsResponse,
   type UpdateResourceResponse,
 } from '../schemas'
 
@@ -39,6 +43,12 @@ export const resourceKeys = {
   nodes: () => [...resourceKeys.all, 'nodes'] as const,
   node: (name: string) => [...resourceKeys.all, 'node', name] as const,
   events: (namespace?: string) => [...resourceKeys.all, 'events', namespace] as const,
+  persistentvolumes: () => [...resourceKeys.all, 'persistentvolumes'] as const,
+  persistentvolume: (name: string) => [...resourceKeys.all, 'persistentvolume', name] as const,
+  persistentvolumeclaims: (namespace?: string) =>
+    [...resourceKeys.all, 'persistentvolumeclaims', namespace] as const,
+  persistentvolumeclaim: (namespace: string, name: string) =>
+    [...resourceKeys.all, 'persistentvolumeclaim', namespace, name] as const,
   yaml: (kind: string, namespace: string, name: string) =>
     [...resourceKeys.all, 'yaml', kind, namespace, name] as const,
 }
@@ -158,6 +168,44 @@ export function useNode(name: string) {
   const { data, ...rest } = useNodes()
   return {
     data: data?.items.find((n) => n.Name === name),
+    ...rest,
+  }
+}
+
+export function usePersistentVolumes() {
+  return useQuery({
+    queryKey: resourceKeys.persistentvolumes(),
+    queryFn: () =>
+      get<PersistentVolumesResponse>('/persistentvolumes', PersistentVolumesResponseSchema),
+    refetchInterval: 30000,
+  })
+}
+
+export function usePersistentVolume(name: string) {
+  const { data, ...rest } = usePersistentVolumes()
+  return {
+    data: data?.items.find((pv) => pv.Name === name),
+    ...rest,
+  }
+}
+
+export function usePersistentVolumeClaims(namespace?: string) {
+  const query = namespace ? `?namespace=${namespace}` : ''
+  return useQuery({
+    queryKey: resourceKeys.persistentvolumeclaims(namespace),
+    queryFn: () =>
+      get<PersistentVolumeClaimsResponse>(
+        `/persistentvolumeclaims${query}`,
+        PersistentVolumeClaimsResponseSchema
+      ),
+    refetchInterval: 30000,
+  })
+}
+
+export function usePersistentVolumeClaim(namespace: string, name: string) {
+  const { data, ...rest } = usePersistentVolumeClaims(namespace)
+  return {
+    data: data?.items.find((pvc) => pvc.Name === name),
     ...rest,
   }
 }

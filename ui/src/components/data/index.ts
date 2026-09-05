@@ -1,6 +1,6 @@
 export { ResourceTable } from './ResourceTable'
 export { PageHeader } from './PageHeader'
-export { StatusBadge, getPodStatus, getDeploymentStatus, getNodeStatus, getServiceType, type Status } from './StatusBadge'
+export { StatusBadge, getPodStatus, getDeploymentStatus, getNodeStatus, getServiceType, getPVStatus, getPVCStatus, type Status } from './StatusBadge'
 export {
   podColumns,
   deploymentColumns,
@@ -8,6 +8,8 @@ export {
   configMapColumns,
   secretColumns,
   nodeColumns,
+  persistentVolumeColumns,
+  persistentVolumeClaimColumns,
 } from './ColumnDefinitions'
 export { ResourceUsageBar, formatBytes, formatCPU } from './ResourceUsageBar'
 export { TableSkeleton, TableRowSkeleton } from './TableSkeleton'

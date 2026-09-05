@@ -97,3 +97,19 @@ func (s *Service) ListNodes(ctx context.Context) ([]resource.Node, error) {
 func (s *Service) GetNode(ctx context.Context, name string) (*resource.Node, error) {
 	return s.k8sAdapter.GetNode(ctx, name)
 }
+
+func (s *Service) ListPersistentVolumes(ctx context.Context) ([]resource.PersistentVolume, error) {
+	return s.k8sAdapter.ListPersistentVolumes(ctx)
+}
+
+func (s *Service) GetPersistentVolume(ctx context.Context, name string) (*resource.PersistentVolume, error) {
+	return s.k8sAdapter.GetPersistentVolume(ctx, name)
+}
+
+func (s *Service) ListPersistentVolumeClaims(ctx context.Context, namespace string) ([]resource.PersistentVolumeClaim, error) {
+	return s.k8sAdapter.ListPersistentVolumeClaims(ctx, namespace)
+}
+
+func (s *Service) GetPersistentVolumeClaim(ctx context.Context, namespace, name string) (*resource.PersistentVolumeClaim, error) {
+	return s.k8sAdapter.GetPersistentVolumeClaim(ctx, namespace, name)
+}

@@ -56,3 +56,19 @@ export function getServiceType(type: string): Status {
   if (type === 'NodePort') return 'warning'
   return 'neutral'
 }
+
+export function getPVStatus(phase: string): Status {
+  if (phase === 'Bound') return 'success'
+  if (phase === 'Available') return 'info'
+  if (phase === 'Released') return 'warning'
+  if (phase === 'Failed') return 'error'
+  if (phase === 'Pending') return 'warning'
+  return 'neutral'
+}
+
+export function getPVCStatus(phase: string): Status {
+  if (phase === 'Bound') return 'success'
+  if (phase === 'Pending') return 'warning'
+  if (phase === 'Lost') return 'error'
+  return 'neutral'
+}

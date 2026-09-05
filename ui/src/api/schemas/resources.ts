@@ -278,3 +278,83 @@ export type ConfigMapsResponse = z.infer<typeof ConfigMapsResponseSchema>
 export type Secret = z.infer<typeof SecretSchema>
 export type SecretDataValue = z.infer<typeof SecretDataValueSchema>
 export type SecretsResponse = z.infer<typeof SecretsResponseSchema>
+
+const PVClaimRefSchema = z.object({
+  Namespace: z.string(),
+  Name: z.string(),
+  UID: z.string(),
+})
+
+const PVSourceSchema = z.object({
+  Type: z.string(),
+  Path: z.string().optional(),
+  Server: z.string().optional(),
+  SecretName: z.string().optional(),
+  ReadOnly: z.boolean().optional(),
+  FSType: z.string().optional(),
+  Driver: z.string().optional(),
+  VolumeID: z.string().optional(),
+})
+
+export const PersistentVolumeSchema = z.object({
+  Name: z.string(),
+  Capacity: z.string(),
+  AccessModes: z.array(z.string()).nullable(),
+  ReclaimPolicy: z.string(),
+  StorageClassName: z.string(),
+  VolumeMode: z.string().optional(),
+  Phase: z.string(),
+  Reason: z.string().optional(),
+  ClaimRef: PVClaimRefSchema.nullable().optional(),
+  Source: PVSourceSchema,
+  MountOptions: z.array(z.string()).nullable().optional(),
+  NodeAffinity: z.string().optional(),
+  CreatedAt: z.string(),
+  Labels: z.record(z.string(), z.string()).nullable(),
+  Kind: z.string().optional(),
+  APIVersion: z.string().optional(),
+  UID: z.string().optional(),
+})
+
+export const PersistentVolumesResponseSchema = z.object({
+  items: z.array(PersistentVolumeSchema),
+  count: z.number(),
+})
+
+const PVCConditionSchema = z.object({
+  Type: z.string(),
+  Status: z.string(),
+  LastProbeTime: z.string().optional(),
+  LastTransitionTime: z.string().optional(),
+  Reason: z.string().optional(),
+  Message: z.string().optional(),
+})
+
+export const PersistentVolumeClaimSchema = z.object({
+  Name: z.string(),
+  Namespace: z.string(),
+  Phase: z.string(),
+  AccessModes: z.array(z.string()).nullable(),
+  StorageClassName: z.string(),
+  VolumeMode: z.string().optional(),
+  VolumeName: z.string(),
+  Capacity: z.string(),
+  RequestedStorage: z.string(),
+  Conditions: z.array(PVCConditionSchema).nullable().optional(),
+  Selector: z.record(z.string(), z.string()).nullable().optional(),
+  CreatedAt: z.string(),
+  Labels: z.record(z.string(), z.string()).nullable(),
+  Kind: z.string().optional(),
+  APIVersion: z.string().optional(),
+  UID: z.string().optional(),
+})
+
+export const PersistentVolumeClaimsResponseSchema = z.object({
+  items: z.array(PersistentVolumeClaimSchema),
+  count: z.number(),
+})
+
+export type PersistentVolume = z.infer<typeof PersistentVolumeSchema>
+export type PersistentVolumesResponse = z.infer<typeof PersistentVolumesResponseSchema>
+export type PersistentVolumeClaim = z.infer<typeof PersistentVolumeClaimSchema>
+export type PersistentVolumeClaimsResponse = z.infer<typeof PersistentVolumeClaimsResponseSchema>

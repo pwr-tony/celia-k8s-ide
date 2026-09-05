@@ -1,6 +1,6 @@
 import { createColumnHelper } from '@tanstack/react-table'
-import type { Pod, Deployment, Service, Node, ConfigMap, Secret } from '@/api/schemas'
-import { StatusBadge, getPodStatus, getDeploymentStatus, getNodeStatus, getServiceType } from './StatusBadge'
+import type { Pod, Deployment, Service, Node, ConfigMap, Secret, PersistentVolume, PersistentVolumeClaim } from '@/api/schemas'
+import { StatusBadge, getPodStatus, getDeploymentStatus, getNodeStatus, getServiceType, getPVStatus, getPVCStatus } from './StatusBadge'
 
 function formatAge(dateStr: string): string {
   const date = new Date(dateStr)
@@ -215,3 +215,97 @@ const _nodeColumns = [
   }),
 ]
 export const nodeColumns = _nodeColumns as typeof _nodeColumns
+
+const pvHelper = createColumnHelper<PersistentVolume>()
+const _persistentVolumeColumns = [
+  pvHelper.accessor('Name', {
+    header: 'Name',
+    cell: (info) => <span className="font-medium">{info.getValue()}</span>,
+  }),
+  pvHelper.accessor('Capacity', {
+    header: 'Capacity',
+    cell: (info) => <span className="font-mono text-sm">{info.getValue()}</span>,
+  }),
+  pvHelper.accessor('AccessModes', {
+    header: 'Access Modes',
+    cell: (info) => {
+      const modes = info.getValue()
+      if (!modes?.length) return '-'
+      return modes.map((m) => m.replace('ReadWriteOnce', 'RWO').replace('ReadOnlyMany', 'ROX').replace('ReadWriteMany', 'RWX')).join(', ')
+    },
+  }),
+  pvHelper.accessor('ReclaimPolicy', {
+    header: 'Reclaim',
+    cell: (info) => info.getValue(),
+  }),
+  pvHelper.accessor('Phase', {
+    header: 'Status',
+    cell: (info) => (
+      <StatusBadge status={getPVStatus(info.getValue())}>
+        {info.getValue()}
+      </StatusBadge>
+    ),
+  }),
+  pvHelper.accessor('ClaimRef', {
+    header: 'Claim',
+    cell: (info) => {
+      const claim = info.getValue()
+      if (!claim) return '-'
+      return <span className="text-text-secondary">{claim.Namespace}/{claim.Name}</span>
+    },
+  }),
+  pvHelper.accessor('StorageClassName', {
+    header: 'Storage Class',
+    cell: (info) => info.getValue() || '-',
+  }),
+  pvHelper.accessor('CreatedAt', {
+    header: 'Age',
+    cell: (info) => formatAge(info.getValue()),
+  }),
+]
+export const persistentVolumeColumns = _persistentVolumeColumns as typeof _persistentVolumeColumns
+
+const pvcHelper = createColumnHelper<PersistentVolumeClaim>()
+const _persistentVolumeClaimColumns = [
+  pvcHelper.accessor('Name', {
+    header: 'Name',
+    cell: (info) => <span className="font-medium">{info.getValue()}</span>,
+  }),
+  pvcHelper.accessor('Namespace', {
+    header: 'Namespace',
+    cell: (info) => <span className="text-text-secondary">{info.getValue()}</span>,
+  }),
+  pvcHelper.accessor('Phase', {
+    header: 'Status',
+    cell: (info) => (
+      <StatusBadge status={getPVCStatus(info.getValue())}>
+        {info.getValue()}
+      </StatusBadge>
+    ),
+  }),
+  pvcHelper.accessor('VolumeName', {
+    header: 'Volume',
+    cell: (info) => info.getValue() || '-',
+  }),
+  pvcHelper.accessor('Capacity', {
+    header: 'Capacity',
+    cell: (info) => <span className="font-mono text-sm">{info.getValue() || '-'}</span>,
+  }),
+  pvcHelper.accessor('AccessModes', {
+    header: 'Access Modes',
+    cell: (info) => {
+      const modes = info.getValue()
+      if (!modes?.length) return '-'
+      return modes.map((m) => m.replace('ReadWriteOnce', 'RWO').replace('ReadOnlyMany', 'ROX').replace('ReadWriteMany', 'RWX')).join(', ')
+    },
+  }),
+  pvcHelper.accessor('StorageClassName', {
+    header: 'Storage Class',
+    cell: (info) => info.getValue() || '-',
+  }),
+  pvcHelper.accessor('CreatedAt', {
+    header: 'Age',
+    cell: (info) => formatAge(info.getValue()),
+  }),
+]
+export const persistentVolumeClaimColumns = _persistentVolumeClaimColumns as typeof _persistentVolumeClaimColumns

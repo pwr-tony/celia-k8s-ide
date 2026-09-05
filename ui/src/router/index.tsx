@@ -15,6 +15,10 @@ import { SecretListPage } from '@/pages/secrets/SecretListPage'
 import { SecretDetailPage } from '@/pages/secrets/SecretDetailPage'
 import { NodeListPage } from '@/pages/nodes/NodeListPage'
 import { NodeDetailPage } from '@/pages/nodes/NodeDetailPage'
+import { PVListPage } from '@/pages/persistentvolumes/PVListPage'
+import { PVDetailPage } from '@/pages/persistentvolumes/PVDetailPage'
+import { PVCListPage } from '@/pages/persistentvolumeclaims/PVCListPage'
+import { PVCDetailPage } from '@/pages/persistentvolumeclaims/PVCDetailPage'
 import { AuditLogPage } from '@/pages/AuditLogPage'
 
 const router = createBrowserRouter([
@@ -36,6 +40,10 @@ const router = createBrowserRouter([
       { path: ROUTES.SECRET_DETAIL, element: <SecretDetailPage /> },
       { path: ROUTES.NODES, element: <NodeListPage /> },
       { path: ROUTES.NODE_DETAIL, element: <NodeDetailPage /> },
+      { path: ROUTES.PERSISTENT_VOLUMES, element: <PVListPage /> },
+      { path: ROUTES.PERSISTENT_VOLUME_DETAIL, element: <PVDetailPage /> },
+      { path: ROUTES.PERSISTENT_VOLUME_CLAIMS, element: <PVCListPage /> },
+      { path: ROUTES.PERSISTENT_VOLUME_CLAIM_DETAIL, element: <PVCDetailPage /> },
       { path: ROUTES.AUDIT_LOG, element: <AuditLogPage /> },
       { path: '*', element: <NotFound /> },
     ],

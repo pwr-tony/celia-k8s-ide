@@ -389,3 +389,165 @@ func mapEvent(event *corev1.Event) resource.Event {
 
 	return e
 }
+
+func mapPersistentVolume(pv *corev1.PersistentVolume) resource.PersistentVolume {
+	p := resource.PersistentVolume{
+		Resource: resource.Resource{
+			Kind:        resource.KindPersistentVolume,
+			APIVersion:  "v1",
+			Name:        pv.Name,
+			UID:         string(pv.UID),
+			Labels:      pv.Labels,
+			Annotations: pv.Annotations,
+			CreatedAt:   pv.CreationTimestamp.Time,
+		},
+		Phase:         resource.PVPhase(pv.Status.Phase),
+		Reason:        pv.Status.Reason,
+		ReclaimPolicy: string(pv.Spec.PersistentVolumeReclaimPolicy),
+		MountOptions:  pv.Spec.MountOptions,
+	}
+
+	if pv.Spec.StorageClassName != "" {
+		p.StorageClassName = pv.Spec.StorageClassName
+	}
+
+	if pv.Spec.VolumeMode != nil {
+		p.VolumeMode = string(*pv.Spec.VolumeMode)
+	}
+
+	if storage, ok := pv.Spec.Capacity[corev1.ResourceStorage]; ok {
+		p.Capacity = storage.String()
+	}
+
+	for _, mode := range pv.Spec.AccessModes {
+		p.AccessModes = append(p.AccessModes, string(mode))
+	}
+
+	if pv.Spec.ClaimRef != nil {
+		p.ClaimRef = &resource.PVClaimRef{
+			Namespace: pv.Spec.ClaimRef.Namespace,
+			Name:      pv.Spec.ClaimRef.Name,
+			UID:       string(pv.Spec.ClaimRef.UID),
+		}
+	}
+
+	p.Source = mapPVSource(&pv.Spec)
+
+	return p
+}
+
+func mapPVSource(spec *corev1.PersistentVolumeSpec) resource.PVSource {
+	source := resource.PVSource{}
+
+	switch {
+	case spec.HostPath != nil:
+		source.Type = "HostPath"
+		source.Path = spec.HostPath.Path
+	case spec.NFS != nil:
+		source.Type = "NFS"
+		source.Server = spec.NFS.Server
+		source.Path = spec.NFS.Path
+		source.ReadOnly = spec.NFS.ReadOnly
+	case spec.CSI != nil:
+		source.Type = "CSI"
+		source.Driver = spec.CSI.Driver
+		source.VolumeID = spec.CSI.VolumeHandle
+		source.FSType = spec.CSI.FSType
+		source.ReadOnly = spec.CSI.ReadOnly
+	case spec.Local != nil:
+		source.Type = "Local"
+		source.Path = spec.Local.Path
+		if spec.Local.FSType != nil {
+			source.FSType = *spec.Local.FSType
+		}
+	case spec.AWSElasticBlockStore != nil:
+		source.Type = "AWSElasticBlockStore"
+		source.VolumeID = spec.AWSElasticBlockStore.VolumeID
+		source.FSType = spec.AWSElasticBlockStore.FSType
+		source.ReadOnly = spec.AWSElasticBlockStore.ReadOnly
+	case spec.GCEPersistentDisk != nil:
+		source.Type = "GCEPersistentDisk"
+		source.VolumeID = spec.GCEPersistentDisk.PDName
+		source.FSType = spec.GCEPersistentDisk.FSType
+		source.ReadOnly = spec.GCEPersistentDisk.ReadOnly
+	case spec.AzureDisk != nil:
+		source.Type = "AzureDisk"
+		source.VolumeID = spec.AzureDisk.DiskName
+		source.FSType = *spec.AzureDisk.FSType
+		source.ReadOnly = *spec.AzureDisk.ReadOnly
+	case spec.AzureFile != nil:
+		source.Type = "AzureFile"
+		source.SecretName = spec.AzureFile.SecretName
+		source.ReadOnly = spec.AzureFile.ReadOnly
+	case spec.FC != nil:
+		source.Type = "FC"
+	case spec.ISCSI != nil:
+		source.Type = "iSCSI"
+	case spec.RBD != nil:
+		source.Type = "RBD"
+	case spec.CephFS != nil:
+		source.Type = "CephFS"
+	default:
+		source.Type = "Unknown"
+	}
+
+	return source
+}
+
+func mapPersistentVolumeClaim(pvc *corev1.PersistentVolumeClaim) resource.PersistentVolumeClaim {
+	p := resource.PersistentVolumeClaim{
+		Resource: resource.Resource{
+			Kind:        resource.KindPersistentVolumeClaim,
+			APIVersion:  "v1",
+			Name:        pvc.Name,
+			Namespace:   pvc.Namespace,
+			UID:         string(pvc.UID),
+			Labels:      pvc.Labels,
+			Annotations: pvc.Annotations,
+			CreatedAt:   pvc.CreationTimestamp.Time,
+		},
+		Phase:      resource.PVCPhase(pvc.Status.Phase),
+		VolumeName: pvc.Spec.VolumeName,
+	}
+
+	if pvc.Spec.StorageClassName != nil {
+		p.StorageClassName = *pvc.Spec.StorageClassName
+	}
+
+	if pvc.Spec.VolumeMode != nil {
+		p.VolumeMode = string(*pvc.Spec.VolumeMode)
+	}
+
+	for _, mode := range pvc.Spec.AccessModes {
+		p.AccessModes = append(p.AccessModes, string(mode))
+	}
+
+	if pvc.Spec.Resources.Requests != nil {
+		if storage, ok := pvc.Spec.Resources.Requests[corev1.ResourceStorage]; ok {
+			p.RequestedStorage = storage.String()
+		}
+	}
+
+	if pvc.Status.Capacity != nil {
+		if storage, ok := pvc.Status.Capacity[corev1.ResourceStorage]; ok {
+			p.Capacity = storage.String()
+		}
+	}
+
+	if pvc.Spec.Selector != nil && pvc.Spec.Selector.MatchLabels != nil {
+		p.Selector = pvc.Spec.Selector.MatchLabels
+	}
+
+	for _, cond := range pvc.Status.Conditions {
+		p.Conditions = append(p.Conditions, resource.PVCCondition{
+			Type:               string(cond.Type),
+			Status:             string(cond.Status),
+			LastProbeTime:      cond.LastProbeTime.String(),
+			LastTransitionTime: cond.LastTransitionTime.String(),
+			Reason:             cond.Reason,
+			Message:            cond.Message,
+		})
+	}
+
+	return p
+}
