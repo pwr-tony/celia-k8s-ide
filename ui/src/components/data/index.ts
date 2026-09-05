@@ -10,6 +10,7 @@ export {
   nodeColumns,
   persistentVolumeColumns,
   persistentVolumeClaimColumns,
+  ingressColumns,
 } from './ColumnDefinitions'
 export { ResourceUsageBar, formatBytes, formatCPU } from './ResourceUsageBar'
 export { TableSkeleton, TableRowSkeleton } from './TableSkeleton'

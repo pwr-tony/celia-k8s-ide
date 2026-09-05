@@ -97,8 +97,8 @@
 - [ ] Custom problem detectors (YAML-based rules)
 - [ ] Prometheus metrics integration
 - [ ] Terminal/exec to pods (xterm.js)
-- [ ] PVC/PV explorer
-- [ ] Ingress explorer
+- [x] PVC/PV explorer
+- [x] Ingress explorer
 - [ ] Multi-container log comparison (side-by-side)
 - [ ] Export problems report (PDF/HTML)
 - [ ] Desktop notifications for critical problems

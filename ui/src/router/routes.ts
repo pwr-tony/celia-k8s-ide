@@ -16,6 +16,8 @@ export const ROUTES = {
   PERSISTENT_VOLUME_DETAIL: '/persistentvolumes/:name',
   PERSISTENT_VOLUME_CLAIMS: '/persistentvolumeclaims',
   PERSISTENT_VOLUME_CLAIM_DETAIL: '/persistentvolumeclaims/:namespace/:name',
+  INGRESSES: '/ingresses',
+  INGRESS_DETAIL: '/ingresses/:namespace/:name',
   AUDIT_LOG: '/audit',
 } as const
 
@@ -51,6 +53,10 @@ export function pvcDetailPath(namespace: string, name: string): string {
   return `/persistentvolumeclaims/${encodeURIComponent(namespace)}/${encodeURIComponent(name)}`
 }
 
+export function ingressDetailPath(namespace: string, name: string): string {
+  return `/ingresses/${encodeURIComponent(namespace)}/${encodeURIComponent(name)}`
+}
+
 export type ResourceType =
   | 'pods'
   | 'deployments'
@@ -81,5 +87,6 @@ export const RESOURCE_TO_ROUTE: Record<string, string> = {
   nodes: ROUTES.NODES,
   persistentvolumes: ROUTES.PERSISTENT_VOLUMES,
   persistentvolumeclaims: ROUTES.PERSISTENT_VOLUME_CLAIMS,
+  ingresses: ROUTES.INGRESSES,
   audit: ROUTES.AUDIT_LOG,
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/tonymora/celia/internal/domain/resource"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
+	networkingv1 "k8s.io/api/networking/v1"
 )
 
 func mapPod(pod *corev1.Pod) resource.Pod {
@@ -550,4 +551,70 @@ func mapPersistentVolumeClaim(pvc *corev1.PersistentVolumeClaim) resource.Persis
 	}
 
 	return p
+}
+
+func mapIngress(ing *networkingv1.Ingress) resource.Ingress {
+	i := resource.Ingress{
+		Resource: resource.Resource{
+			Kind:        resource.KindIngress,
+			APIVersion:  "networking.k8s.io/v1",
+			Name:        ing.Name,
+			Namespace:   ing.Namespace,
+			UID:         string(ing.UID),
+			Labels:      ing.Labels,
+			Annotations: ing.Annotations,
+			CreatedAt:   ing.CreationTimestamp.Time,
+		},
+	}
+
+	if ing.Spec.IngressClassName != nil {
+		i.IngressClassName = *ing.Spec.IngressClassName
+	}
+
+	if ing.Spec.DefaultBackend != nil && ing.Spec.DefaultBackend.Service != nil {
+		i.DefaultBackend = &resource.IngressBackend{
+			ServiceName: ing.Spec.DefaultBackend.Service.Name,
+			ServicePort: ing.Spec.DefaultBackend.Service.Port.String(),
+		}
+	}
+
+	for _, tls := range ing.Spec.TLS {
+		i.TLS = append(i.TLS, resource.IngressTLS{
+			Hosts:      tls.Hosts,
+			SecretName: tls.SecretName,
+		})
+	}
+
+	for _, rule := range ing.Spec.Rules {
+		r := resource.IngressRule{
+			Host: rule.Host,
+		}
+		if rule.HTTP != nil {
+			for _, path := range rule.HTTP.Paths {
+				p := resource.IngressPath{
+					Path: path.Path,
+				}
+				if path.PathType != nil {
+					p.PathType = string(*path.PathType)
+				}
+				if path.Backend.Service != nil {
+					p.ServiceName = path.Backend.Service.Name
+					p.ServicePort = path.Backend.Service.Port.String()
+				}
+				r.Paths = append(r.Paths, p)
+			}
+		}
+		i.Rules = append(i.Rules, r)
+	}
+
+	for _, lbIngress := range ing.Status.LoadBalancer.Ingress {
+		if lbIngress.IP != "" {
+			i.LoadBalancerIPs = append(i.LoadBalancerIPs, lbIngress.IP)
+		}
+		if lbIngress.Hostname != "" {
+			i.LoadBalancerIPs = append(i.LoadBalancerIPs, lbIngress.Hostname)
+		}
+	}
+
+	return i
 }

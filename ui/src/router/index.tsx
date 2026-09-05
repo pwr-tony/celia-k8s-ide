@@ -19,6 +19,8 @@ import { PVListPage } from '@/pages/persistentvolumes/PVListPage'
 import { PVDetailPage } from '@/pages/persistentvolumes/PVDetailPage'
 import { PVCListPage } from '@/pages/persistentvolumeclaims/PVCListPage'
 import { PVCDetailPage } from '@/pages/persistentvolumeclaims/PVCDetailPage'
+import { IngressListPage } from '@/pages/ingresses/IngressListPage'
+import { IngressDetailPage } from '@/pages/ingresses/IngressDetailPage'
 import { AuditLogPage } from '@/pages/AuditLogPage'
 
 const router = createBrowserRouter([
@@ -44,6 +46,8 @@ const router = createBrowserRouter([
       { path: ROUTES.PERSISTENT_VOLUME_DETAIL, element: <PVDetailPage /> },
       { path: ROUTES.PERSISTENT_VOLUME_CLAIMS, element: <PVCListPage /> },
       { path: ROUTES.PERSISTENT_VOLUME_CLAIM_DETAIL, element: <PVCDetailPage /> },
+      { path: ROUTES.INGRESSES, element: <IngressListPage /> },
+      { path: ROUTES.INGRESS_DETAIL, element: <IngressDetailPage /> },
       { path: ROUTES.AUDIT_LOG, element: <AuditLogPage /> },
       { path: '*', element: <NotFound /> },
     ],

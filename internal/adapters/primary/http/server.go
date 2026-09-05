@@ -112,6 +112,8 @@ func (s *Server) setupRouter() http.Handler {
 	mux.HandleFunc("GET /api/v1/persistentvolumes/{name}", resourceHandler.GetPersistentVolume)
 	mux.HandleFunc("GET /api/v1/persistentvolumeclaims", resourceHandler.ListPersistentVolumeClaims)
 	mux.HandleFunc("GET /api/v1/persistentvolumeclaims/{namespace}/{name}", resourceHandler.GetPersistentVolumeClaim)
+	mux.HandleFunc("GET /api/v1/ingresses", resourceHandler.ListIngresses)
+	mux.HandleFunc("GET /api/v1/ingresses/{namespace}/{name}", resourceHandler.GetIngress)
 
 	mux.HandleFunc("GET /api/v1/logs/{namespace}/{pod}", observabilityHandler.GetLogs)
 	mux.HandleFunc("GET /api/v1/events", observabilityHandler.ListEvents)

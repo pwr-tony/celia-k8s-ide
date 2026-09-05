@@ -323,4 +323,29 @@ func (h *ResourceHandler) GetPersistentVolumeClaim(w http.ResponseWriter, r *htt
 	writeJSON(w, http.StatusOK, pvc)
 }
 
+func (h *ResourceHandler) ListIngresses(w http.ResponseWriter, r *http.Request) {
+	namespace := getQueryParam(r, "namespace", "")
+
+	ingresses, err := h.service.ListIngresses(r.Context(), namespace)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	writeJSON(w, http.StatusOK, map[string]interface{}{"items": ingresses, "count": len(ingresses)})
+}
+
+func (h *ResourceHandler) GetIngress(w http.ResponseWriter, r *http.Request) {
+	namespace := r.PathValue("namespace")
+	name := r.PathValue("name")
+
+	ingress, err := h.service.GetIngress(r.Context(), namespace, name)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	writeJSON(w, http.StatusOK, ingress)
+}
+
 var _ = json.Marshal

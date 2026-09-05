@@ -1,5 +1,5 @@
 import { createColumnHelper } from '@tanstack/react-table'
-import type { Pod, Deployment, Service, Node, ConfigMap, Secret, PersistentVolume, PersistentVolumeClaim } from '@/api/schemas'
+import type { Pod, Deployment, Service, Node, ConfigMap, Secret, PersistentVolume, PersistentVolumeClaim, Ingress } from '@/api/schemas'
 import { StatusBadge, getPodStatus, getDeploymentStatus, getNodeStatus, getServiceType, getPVStatus, getPVCStatus } from './StatusBadge'
 
 function formatAge(dateStr: string): string {
@@ -309,3 +309,51 @@ const _persistentVolumeClaimColumns = [
   }),
 ]
 export const persistentVolumeClaimColumns = _persistentVolumeClaimColumns as typeof _persistentVolumeClaimColumns
+
+const ingressHelper = createColumnHelper<Ingress>()
+const _ingressColumns = [
+  ingressHelper.accessor('Name', {
+    header: 'Name',
+    cell: (info) => <span className="font-medium">{info.getValue()}</span>,
+  }),
+  ingressHelper.accessor('Namespace', {
+    header: 'Namespace',
+    cell: (info) => <span className="text-text-secondary">{info.getValue()}</span>,
+  }),
+  ingressHelper.accessor('IngressClassName', {
+    header: 'Class',
+    cell: (info) => info.getValue() || '-',
+  }),
+  ingressHelper.accessor('Rules', {
+    id: 'hosts',
+    header: 'Hosts',
+    cell: (info) => {
+      const rules = info.getValue()
+      if (!rules?.length) return '-'
+      const hosts = rules.map((r) => r.Host).filter(Boolean)
+      if (!hosts.length) return '*'
+      return hosts.join(', ')
+    },
+  }),
+  ingressHelper.accessor('TLS', {
+    header: 'TLS',
+    cell: (info) => {
+      const tls = info.getValue()
+      if (!tls?.length) return <span className="text-text-tertiary">No</span>
+      return <StatusBadge status="success">Yes</StatusBadge>
+    },
+  }),
+  ingressHelper.accessor('LoadBalancerIPs', {
+    header: 'Address',
+    cell: (info) => {
+      const ips = info.getValue()
+      if (!ips?.length) return '-'
+      return <span className="font-mono text-sm">{ips[0]}</span>
+    },
+  }),
+  ingressHelper.accessor('CreatedAt', {
+    header: 'Age',
+    cell: (info) => formatAge(info.getValue()),
+  }),
+]
+export const ingressColumns = _ingressColumns as typeof _ingressColumns

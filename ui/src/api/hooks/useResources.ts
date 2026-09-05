@@ -11,6 +11,7 @@ import {
   SecretsResponseSchema,
   PersistentVolumesResponseSchema,
   PersistentVolumeClaimsResponseSchema,
+  IngressesResponseSchema,
   UpdateResourceResponseSchema,
   type PodsResponse,
   type DeploymentsResponse,
@@ -21,6 +22,7 @@ import {
   type SecretsResponse,
   type PersistentVolumesResponse,
   type PersistentVolumeClaimsResponse,
+  type IngressesResponse,
   type UpdateResourceResponse,
 } from '../schemas'
 
@@ -49,6 +51,9 @@ export const resourceKeys = {
     [...resourceKeys.all, 'persistentvolumeclaims', namespace] as const,
   persistentvolumeclaim: (namespace: string, name: string) =>
     [...resourceKeys.all, 'persistentvolumeclaim', namespace, name] as const,
+  ingresses: (namespace?: string) => [...resourceKeys.all, 'ingresses', namespace] as const,
+  ingress: (namespace: string, name: string) =>
+    [...resourceKeys.all, 'ingress', namespace, name] as const,
   yaml: (kind: string, namespace: string, name: string) =>
     [...resourceKeys.all, 'yaml', kind, namespace, name] as const,
 }
@@ -206,6 +211,23 @@ export function usePersistentVolumeClaim(namespace: string, name: string) {
   const { data, ...rest } = usePersistentVolumeClaims(namespace)
   return {
     data: data?.items.find((pvc) => pvc.Name === name),
+    ...rest,
+  }
+}
+
+export function useIngresses(namespace?: string) {
+  const query = namespace ? `?namespace=${namespace}` : ''
+  return useQuery({
+    queryKey: resourceKeys.ingresses(namespace),
+    queryFn: () => get<IngressesResponse>(`/ingresses${query}`, IngressesResponseSchema),
+    refetchInterval: 30000,
+  })
+}
+
+export function useIngress(namespace: string, name: string) {
+  const { data, ...rest } = useIngresses(namespace)
+  return {
+    data: data?.items.find((ing) => ing.Name === name),
     ...rest,
   }
 }

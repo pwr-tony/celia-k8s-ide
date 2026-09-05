@@ -114,6 +114,17 @@ func (a *Adapter) ListResources(ctx context.Context, kind resource.Kind, namespa
 		}
 		return result, nil
 
+	case resource.KindIngress:
+		ingresses, err := a.ListIngresses(ctx, namespace)
+		if err != nil {
+			return nil, err
+		}
+		result := make([]resource.Resource, len(ingresses))
+		for i, ing := range ingresses {
+			result[i] = ing.Resource
+		}
+		return result, nil
+
 	default:
 		return nil, fmt.Errorf("unsupported resource kind: %s", kind)
 	}
@@ -176,6 +187,13 @@ func (a *Adapter) GetResource(ctx context.Context, kind resource.Kind, namespace
 			return nil, err
 		}
 		return &pvc.Resource, nil
+
+	case resource.KindIngress:
+		ingress, err := a.GetIngress(ctx, namespace, name)
+		if err != nil {
+			return nil, err
+		}
+		return &ingress.Resource, nil
 
 	default:
 		return nil, fmt.Errorf("unsupported resource kind: %s", kind)

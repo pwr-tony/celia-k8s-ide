@@ -113,3 +113,11 @@ func (s *Service) ListPersistentVolumeClaims(ctx context.Context, namespace stri
 func (s *Service) GetPersistentVolumeClaim(ctx context.Context, namespace, name string) (*resource.PersistentVolumeClaim, error) {
 	return s.k8sAdapter.GetPersistentVolumeClaim(ctx, namespace, name)
 }
+
+func (s *Service) ListIngresses(ctx context.Context, namespace string) ([]resource.Ingress, error) {
+	return s.k8sAdapter.ListIngresses(ctx, namespace)
+}
+
+func (s *Service) GetIngress(ctx context.Context, namespace, name string) (*resource.Ingress, error) {
+	return s.k8sAdapter.GetIngress(ctx, namespace, name)
+}

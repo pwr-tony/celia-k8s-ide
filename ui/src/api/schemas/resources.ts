@@ -358,3 +358,48 @@ export type PersistentVolume = z.infer<typeof PersistentVolumeSchema>
 export type PersistentVolumesResponse = z.infer<typeof PersistentVolumesResponseSchema>
 export type PersistentVolumeClaim = z.infer<typeof PersistentVolumeClaimSchema>
 export type PersistentVolumeClaimsResponse = z.infer<typeof PersistentVolumeClaimsResponseSchema>
+
+const IngressBackendSchema = z.object({
+  ServiceName: z.string(),
+  ServicePort: z.string(),
+})
+
+const IngressTLSSchema = z.object({
+  Hosts: z.array(z.string()).nullable(),
+  SecretName: z.string(),
+})
+
+const IngressPathSchema = z.object({
+  Path: z.string(),
+  PathType: z.string().optional(),
+  ServiceName: z.string(),
+  ServicePort: z.string(),
+})
+
+const IngressRuleSchema = z.object({
+  Host: z.string(),
+  Paths: z.array(IngressPathSchema).nullable(),
+})
+
+export const IngressSchema = z.object({
+  Name: z.string(),
+  Namespace: z.string(),
+  IngressClassName: z.string().optional(),
+  DefaultBackend: IngressBackendSchema.nullable().optional(),
+  TLS: z.array(IngressTLSSchema).nullable().optional(),
+  Rules: z.array(IngressRuleSchema).nullable(),
+  LoadBalancerIPs: z.array(z.string()).nullable().optional(),
+  CreatedAt: z.string(),
+  Labels: z.record(z.string(), z.string()).nullable(),
+  Kind: z.string().optional(),
+  APIVersion: z.string().optional(),
+  UID: z.string().optional(),
+})
+
+export const IngressesResponseSchema = z.object({
+  items: z.array(IngressSchema),
+  count: z.number(),
+})
+
+export type Ingress = z.infer<typeof IngressSchema>
+export type IngressesResponse = z.infer<typeof IngressesResponseSchema>
