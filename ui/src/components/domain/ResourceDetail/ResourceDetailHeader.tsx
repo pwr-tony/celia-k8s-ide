@@ -58,25 +58,27 @@ export function ResourceDetailHeader({
 }: ResourceDetailHeaderProps) {
   return (
     <header className="shrink-0 border-b border-border-subtle bg-bg-secondary">
-      <div className="px-6 py-4">
+      <div className="px-4 sm:px-6 py-4">
         <div className="flex items-center justify-between mb-2">
           <Breadcrumbs items={breadcrumbs} />
-          <ConnectionStatus />
+          <div className="hidden sm:block">
+            <ConnectionStatus />
+          </div>
         </div>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="flex items-center gap-4 min-w-0">
+            <div className="min-w-0">
               <div className="flex items-center gap-2">
                 <span className="text-xs text-text-tertiary uppercase">{kind}</span>
                 {namespace && (
                   <span className="text-xs text-text-tertiary">in {namespace}</span>
                 )}
               </div>
-              <h1 className="text-xl font-semibold text-text-primary">{name}</h1>
+              <h1 className="text-lg sm:text-xl font-semibold text-text-primary truncate">{name}</h1>
             </div>
             {status && <StatusBadge status={statusType}>{status}</StatusBadge>}
           </div>
-          {actions && <div className="flex items-center gap-2">{actions}</div>}
+          {actions && <div className="flex items-center gap-2 shrink-0">{actions}</div>}
         </div>
       </div>
     </header>

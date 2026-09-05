@@ -49,8 +49,8 @@ export function ResourceDetailLayout({
       />
       <main className="flex-1 overflow-hidden flex flex-col">
         <Tabs defaultValue={defaultTab ?? tabs[0]?.id} className="flex flex-col flex-1 min-h-0">
-          <div className="px-6 pt-4 border-b border-border-subtle bg-bg-secondary">
-            <TabsList className="bg-transparent p-0 h-auto gap-4">
+          <div className="px-4 sm:px-6 pt-4 border-b border-border-subtle bg-bg-secondary overflow-x-auto">
+            <TabsList className="bg-transparent p-0 h-auto gap-4 min-w-max">
               {tabs.map((tab) => (
                 <TabsTrigger
                   key={tab.id}

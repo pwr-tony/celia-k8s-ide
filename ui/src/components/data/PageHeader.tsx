@@ -38,12 +38,14 @@ function ConnectionStatus() {
 export function PageHeader({ title, children }: PageHeaderProps) {
   return (
     <header className="shrink-0 border-b border-border-subtle bg-bg-secondary">
-      <div className="flex items-center justify-between px-6 py-4">
-        <div className="flex items-center gap-4">
-          <h1 className="text-lg font-semibold text-text-primary">{title}</h1>
+      <div className="flex items-center justify-between px-4 sm:px-6 py-4">
+        <div className="flex items-center gap-4 min-w-0">
+          <h1 className="text-lg font-semibold text-text-primary truncate">{title}</h1>
           {children}
         </div>
-        <ConnectionStatus />
+        <div className="hidden sm:block shrink-0">
+          <ConnectionStatus />
+        </div>
       </div>
     </header>
   )

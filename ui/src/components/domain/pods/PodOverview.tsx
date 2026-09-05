@@ -18,7 +18,7 @@ export function PodOverview({ pod }: PodOverviewProps) {
   const labelEntries = Object.entries(pod.Labels || {})
 
   return (
-    <div className="p-6 space-y-6 overflow-auto">
+    <div className="p-4 sm:p-6 space-y-6 overflow-auto">
       <section>
         <h3 className="text-sm font-medium text-text-secondary mb-4">Status</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -108,8 +108,8 @@ export function PodOverview({ pod }: PodOverviewProps) {
 
       <section>
         <h3 className="text-sm font-medium text-text-secondary mb-4">Conditions</h3>
-        <div className="card overflow-hidden">
-          <table className="w-full text-sm">
+        <div className="card overflow-x-auto">
+          <table className="w-full text-sm min-w-[400px]">
             <thead className="bg-bg-tertiary">
               <tr>
                 <th className="text-left px-4 py-2 text-text-secondary font-medium">Type</th>

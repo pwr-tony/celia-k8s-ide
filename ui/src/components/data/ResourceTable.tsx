@@ -161,11 +161,12 @@ export function ResourceTable<T>({
         onKeyDown={handleKeyDown}
         className={cn(
           'flex-1 overflow-auto border rounded-lg bg-bg-secondary focus:outline-none',
+          'min-w-0',
           isFocused ? 'border-accent-primary' : 'border-border-subtle'
         )}
         style={columnSizeVars as React.CSSProperties}
       >
-        <table className="w-full border-collapse">
+        <table className="w-full border-collapse min-w-[600px]">
           <thead className="sticky top-0 z-10 bg-bg-tertiary">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>

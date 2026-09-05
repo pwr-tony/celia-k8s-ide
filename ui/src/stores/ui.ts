@@ -10,6 +10,7 @@ const defaultExpandedCategories = ['workloads', 'troubleshooting']
 interface UIState {
   theme: Theme
   sidebarCollapsed: boolean
+  mobileSidebarOpen: boolean
   expandedCategories: string[]
   sidebarHovering: boolean
   bottomPanelOpen: boolean
@@ -20,6 +21,8 @@ interface UIState {
   setTheme: (theme: Theme) => void
   toggleSidebar: () => void
   setSidebarCollapsed: (collapsed: boolean) => void
+  setMobileSidebarOpen: (open: boolean) => void
+  toggleMobileSidebar: () => void
   toggleCategory: (categoryId: string) => void
   setExpandedCategories: (categories: string[]) => void
   setSidebarHovering: (hovering: boolean) => void
@@ -34,6 +37,7 @@ export const useUIStore = create<UIState>()(
     (set) => ({
       theme: 'dark',
       sidebarCollapsed: false,
+      mobileSidebarOpen: false,
       expandedCategories: defaultExpandedCategories,
       sidebarHovering: false,
       bottomPanelOpen: false,
@@ -44,6 +48,8 @@ export const useUIStore = create<UIState>()(
       setTheme: (theme) => set({ theme }),
       toggleSidebar: () => set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
       setSidebarCollapsed: (sidebarCollapsed) => set({ sidebarCollapsed }),
+      setMobileSidebarOpen: (mobileSidebarOpen) => set({ mobileSidebarOpen }),
+      toggleMobileSidebar: () => set((state) => ({ mobileSidebarOpen: !state.mobileSidebarOpen })),
       toggleCategory: (categoryId) =>
         set((state) => ({
           expandedCategories: state.expandedCategories.includes(categoryId)

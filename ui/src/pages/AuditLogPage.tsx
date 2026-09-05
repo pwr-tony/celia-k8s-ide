@@ -209,9 +209,9 @@ export function AuditLogPage() {
   return (
     <>
       <header className="shrink-0 border-b border-border-subtle bg-bg-secondary">
-        <div className="flex items-center justify-between px-6 py-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 sm:px-6 py-4">
           <div>
-            <h1 className="text-xl font-semibold text-text-primary">Audit Log</h1>
+            <h1 className="text-lg sm:text-xl font-semibold text-text-primary">Audit Log</h1>
             <p className="text-sm text-text-tertiary mt-0.5">
               History of operations performed on the cluster
             </p>
@@ -230,8 +230,8 @@ export function AuditLogPage() {
       </header>
 
       <main className="flex-1 overflow-auto">
-        <div className="p-6">
-          <div className="flex items-center gap-4 mb-4">
+        <div className="p-4 sm:p-6">
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4 mb-4">
             <div className="flex items-center gap-2">
               <Filter className="h-4 w-4 text-text-tertiary" />
               <select

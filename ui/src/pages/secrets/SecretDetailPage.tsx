@@ -14,7 +14,7 @@ function SecretOverview({ secret }: { secret: Secret }) {
   const dataKeys = Object.keys(secret.Data || {})
 
   return (
-    <div className="p-6 space-y-6 overflow-auto">
+    <div className="p-4 sm:p-6 space-y-6 overflow-auto">
       <section>
         <h3 className="text-sm font-medium text-text-secondary mb-4">Info</h3>
         <div className="card p-4">
@@ -77,7 +77,7 @@ function SecretDataTab({ secret }: { secret: Secret }) {
   }
 
   return (
-    <div className="p-6 space-y-4 overflow-auto">
+    <div className="p-4 sm:p-6 space-y-4 overflow-auto">
       {dataEntries.map(([key, dataValue]) => (
         <div key={key} className="card">
           <div className="flex items-center justify-between px-4 py-3 border-b border-border-subtle bg-bg-tertiary">

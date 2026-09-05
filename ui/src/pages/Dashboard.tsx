@@ -49,7 +49,7 @@ function ClusterStats() {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {[1, 2, 3, 4].map((i) => (
           <div key={i} className="h-32 animate-pulse bg-bg-tertiary rounded-lg" />
         ))}
@@ -60,7 +60,7 @@ function ClusterStats() {
   if (!health) return null
 
   return (
-    <div className="grid grid-cols-4 gap-4">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
       <StatCard
         label="Nodes"
         value={health.nodes.total}
@@ -154,9 +154,9 @@ export function Dashboard() {
   return (
     <>
       <header className="shrink-0 border-b border-border-subtle bg-bg-secondary">
-        <div className="flex items-center justify-between px-6 py-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 sm:px-6 py-4">
           <div>
-            <h1 className="text-xl font-semibold text-text-primary">Dashboard</h1>
+            <h1 className="text-lg sm:text-xl font-semibold text-text-primary">Dashboard</h1>
             <p className="text-sm text-text-tertiary mt-0.5">Cluster overview and health status</p>
           </div>
           <div className="flex items-center gap-4">
@@ -166,11 +166,11 @@ export function Dashboard() {
         </div>
       </header>
 
-      <main className="flex-1 overflow-auto p-6 space-y-6">
+      <main className="flex-1 overflow-auto p-4 sm:p-6 space-y-6">
         <ClusterStats />
 
-        <div className="grid grid-cols-3 gap-6">
-          <div className="col-span-2">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h2 className="text-lg font-semibold">Active Problems</h2>

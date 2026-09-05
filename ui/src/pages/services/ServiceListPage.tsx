@@ -17,7 +17,7 @@ export function ServiceListPage() {
   return (
     <>
       <PageHeader title="Services" />
-      <main className="flex-1 overflow-hidden p-6">
+      <main className="flex-1 overflow-hidden p-4 sm:p-6">
         <ResourceTable
           data={data?.items ?? []}
           columns={serviceColumns}
