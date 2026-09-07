@@ -70,6 +70,7 @@ func main() {
 	server := http.NewServer(
 		cfg.Server,
 		log,
+		k8sAdapter,
 		clusterService,
 		resourceService,
 		observabilityService,

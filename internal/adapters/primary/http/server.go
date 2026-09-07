@@ -7,6 +7,7 @@ import (
 
 	"github.com/tonymora/celia/internal/adapters/primary/http/handlers"
 	"github.com/tonymora/celia/internal/adapters/primary/http/middleware"
+	"github.com/tonymora/celia/internal/adapters/secondary/kubernetes"
 	"github.com/tonymora/celia/internal/application/cluster"
 	"github.com/tonymora/celia/internal/application/observability"
 	"github.com/tonymora/celia/internal/application/operation"
@@ -20,6 +21,7 @@ type Server struct {
 	server               *http.Server
 	log                  *logger.Logger
 	config               config.ServerConfig
+	k8sAdapter           *kubernetes.Adapter
 	clusterService       *cluster.Service
 	resourceService      *resource.Service
 	observabilityService *observability.Service
@@ -30,6 +32,7 @@ type Server struct {
 func NewServer(
 	cfg config.ServerConfig,
 	log *logger.Logger,
+	k8sAdapter *kubernetes.Adapter,
 	clusterService *cluster.Service,
 	resourceService *resource.Service,
 	observabilityService *observability.Service,
@@ -39,6 +42,7 @@ func NewServer(
 	return &Server{
 		log:                  log.WithComponent("http-server"),
 		config:               cfg,
+		k8sAdapter:           k8sAdapter,
 		clusterService:       clusterService,
 		resourceService:      resourceService,
 		observabilityService: observabilityService,
@@ -136,6 +140,9 @@ func (s *Server) setupRouter() http.Handler {
 
 	wsHandler := handlers.NewWSHandler(s.observabilityService, s.troubleService, s.log)
 	mux.HandleFunc("GET /api/v1/ws", wsHandler.HandleWebSocket)
+
+	terminalHandler := handlers.NewTerminalHandler(s.k8sAdapter, s.log)
+	mux.HandleFunc("GET /api/v1/exec/{namespace}/{pod}", terminalHandler.HandleExec)
 
 	handler := middleware.Logging(s.log)(mux)
 	handler = middleware.Recovery(s.log)(handler)
