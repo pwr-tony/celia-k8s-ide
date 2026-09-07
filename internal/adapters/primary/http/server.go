@@ -129,6 +129,8 @@ func (s *Server) setupRouter() http.Handler {
 	mux.HandleFunc("GET /api/v1/problems", troubleHandler.GetProblems)
 	mux.HandleFunc("GET /api/v1/problems/stats", troubleHandler.GetProblemStats)
 	mux.HandleFunc("GET /api/v1/diagnosis/{kind}/{namespace}/{name}", troubleHandler.GetDiagnosis)
+	mux.HandleFunc("GET /api/v1/rules", troubleHandler.GetCustomRules)
+	mux.HandleFunc("POST /api/v1/rules/reload", troubleHandler.ReloadCustomRules)
 
 	mux.HandleFunc("POST /api/v1/operations/scale/{namespace}/{name}", operationHandler.ScaleDeployment)
 	mux.HandleFunc("POST /api/v1/operations/restart/{kind}/{namespace}/{name}", operationHandler.RolloutRestart)

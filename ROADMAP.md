@@ -94,7 +94,7 @@
 
 ## Phase 6: Advanced Features
 
-- [ ] Custom problem detectors (YAML-based rules)
+- [x] Custom problem detectors (YAML-based rules)
 - [ ] Prometheus metrics integration
 - [x] Terminal/exec to pods (xterm.js)
 - [x] PVC/PV explorer

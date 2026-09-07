@@ -30,9 +30,13 @@ func NewService(k8sAdapter *kubernetes.Adapter, log *logger.Logger, cfg config.T
 		k8sAdapter:  k8sAdapter,
 		log:         log.WithComponent("trouble-service"),
 		config:      cfg,
-		registry:    detector.DefaultRegistry(),
+		registry:    detector.DefaultRegistryWithRules(cfg.RulesDirectory),
 		problems:    make(map[string]*trouble.Problem),
 		subscribers: make([]chan trouble.ProblemUpdate, 0),
+	}
+
+	if cd := s.registry.GetCustomDetector(); cd != nil {
+		s.log.Info("Custom rules loaded", "count", cd.RuleCount(), "directory", cfg.RulesDirectory)
 	}
 
 	return s
@@ -362,6 +366,32 @@ func (s *Service) GetProblemStats(ctx context.Context) (*inbound.ProblemStats, e
 func (s *Service) ForceDetection(ctx context.Context) error {
 	s.runDetection(ctx)
 	return nil
+}
+
+func (s *Service) GetCustomRules() []detector.Rule {
+	if cd := s.registry.GetCustomDetector(); cd != nil {
+		return cd.Rules()
+	}
+	return nil
+}
+
+func (s *Service) ReloadCustomRules() error {
+	if cd := s.registry.GetCustomDetector(); cd != nil {
+		err := cd.ReloadRules()
+		if err != nil {
+			s.log.Error("Failed to reload custom rules", "error", err)
+			return err
+		}
+		s.log.Info("Custom rules reloaded", "count", cd.RuleCount())
+	}
+	return nil
+}
+
+func (s *Service) GetCustomRuleCount() int {
+	if cd := s.registry.GetCustomDetector(); cd != nil {
+		return cd.RuleCount()
+	}
+	return 0
 }
 
 var _ = []resource.Pod{}

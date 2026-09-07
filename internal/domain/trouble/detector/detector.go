@@ -87,6 +87,10 @@ func (r *Registry) DetectAll(input DetectorInput) []trouble.Problem {
 }
 
 func DefaultRegistry() *Registry {
+	return DefaultRegistryWithRules("")
+}
+
+func DefaultRegistryWithRules(rulesDir string) *Registry {
 	registry := NewRegistry()
 
 	registry.Register(NewCrashLoopDetector())
@@ -97,6 +101,16 @@ func DefaultRegistry() *Registry {
 	registry.Register(NewNodeNotReadyDetector())
 	registry.Register(NewNodePressureDetector())
 	registry.Register(NewHighRestartDetector())
+	registry.Register(NewCustomDetector(rulesDir))
 
 	return registry
+}
+
+func (r *Registry) GetCustomDetector() *CustomDetector {
+	if d, ok := r.detectors["custom"]; ok {
+		if cd, ok := d.(*CustomDetector); ok {
+			return cd
+		}
+	}
+	return nil
 }

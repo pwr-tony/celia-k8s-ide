@@ -40,6 +40,8 @@ trouble:
   enabled: true
   # Detection interval
   detection_interval: 10s
+  # Directory for custom detection rules (YAML files)
+  rules_directory: "~/.celia/rules"
   # Enabled detectors
   detectors:
     - crashloop
@@ -50,3 +52,4 @@ trouble:
     - node_notready
     - node_pressure
     - high_restart
+    - custom

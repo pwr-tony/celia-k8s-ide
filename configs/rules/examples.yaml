@@ -1,0 +1,172 @@
+version: "1"
+rules:
+  - name: pod-without-requests
+    enabled: true
+    description: Detect pods that might not have resource requests configured
+    resourceType: pod
+    severity: low
+    problemType: containererror
+    conditions:
+      - field: phase
+        operator: eq
+        value: Running
+      - field: label.app
+        operator: exists
+    title: "Pod {{.Name}} may lack resource requests"
+    message: "Pod {{.Name}} in namespace {{.Namespace}} is running but might not have resource requests configured. This can lead to scheduling issues."
+    possibleCauses:
+      - "Resource requests/limits not defined in pod spec"
+      - "Default limit ranges not configured in namespace"
+    suggestions:
+      - "Define CPU and memory requests for all containers"
+      - "Consider using LimitRange to set defaults"
+      - "Review resource utilization with kubectl top pods"
+
+  - name: high-restart-warning
+    enabled: true
+    description: Detect pods with more than 3 restarts as early warning
+    resourceType: pod
+    severity: low
+    problemType: highrestartcount
+    conditions:
+      - field: restartCount
+        operator: gte
+        value: "3"
+      - field: restartCount
+        operator: lt
+        value: "5"
+      - field: phase
+        operator: eq
+        value: Running
+    title: "Pod {{.Name}} has {{.RestartCount}} restarts"
+    message: "Pod {{.Name}} in namespace {{.Namespace}} has restarted {{.RestartCount}} times. Monitor for potential stability issues."
+    possibleCauses:
+      - "Application crashes during startup"
+      - "OOM conditions"
+      - "Failing health probes"
+    suggestions:
+      - "Check pod logs for error messages"
+      - "Review container resource limits"
+      - "Verify liveness/readiness probe configurations"
+
+  - name: deployment-no-replicas
+    enabled: true
+    description: Detect deployments scaled to zero
+    resourceType: deployment
+    severity: medium
+    problemType: containererror
+    conditions:
+      - field: replicas
+        operator: eq
+        value: "0"
+    title: "Deployment {{.Name}} has zero replicas"
+    message: "Deployment {{.Name}} in namespace {{.Namespace}} is scaled to 0 replicas."
+    possibleCauses:
+      - "Intentionally scaled down"
+      - "HPA scaled down due to low traffic"
+      - "Accidental scale operation"
+    suggestions:
+      - "Verify this is intentional"
+      - "Check HPA configuration if using autoscaling"
+      - "Scale up with: kubectl scale deployment {{.Name}} --replicas=1 -n {{.Namespace}}"
+
+  - name: deployment-unavailable
+    enabled: true
+    description: Detect deployments with unavailable replicas
+    resourceType: deployment
+    severity: high
+    problemType: containererror
+    conditions:
+      - field: replicas
+        operator: gt
+        value: "0"
+      - field: unavailableReplicas
+        operator: gt
+        value: "0"
+    title: "Deployment {{.Name}} has unavailable replicas"
+    message: "Deployment {{.Name}} in namespace {{.Namespace}} has {{.Replicas}} desired but only {{.AvailableReplicas}} available."
+    possibleCauses:
+      - "Pods failing to start"
+      - "Image pull errors"
+      - "Resource constraints"
+      - "Node issues"
+    suggestions:
+      - "Check pod status: kubectl get pods -l app={{.Name}} -n {{.Namespace}}"
+      - "Review deployment events: kubectl describe deployment {{.Name}} -n {{.Namespace}}"
+      - "Check for resource quota issues"
+
+  - name: node-unschedulable
+    enabled: true
+    description: Detect nodes marked as unschedulable
+    resourceType: node
+    severity: medium
+    problemType: nodeunschedulable
+    conditions:
+      - field: unschedulable
+        operator: eq
+        value: "true"
+    title: "Node {{.NodeName}} is unschedulable"
+    message: "Node {{.NodeName}} is marked as unschedulable (cordoned)."
+    possibleCauses:
+      - "Node was cordoned for maintenance"
+      - "Draining operation in progress"
+      - "Manual intervention"
+    suggestions:
+      - "Check if maintenance is complete"
+      - "Uncordon if ready: kubectl uncordon {{.NodeName}}"
+      - "Review node status and conditions"
+
+  - name: pod-pending-long
+    enabled: true
+    description: Detect pods pending for more than 5 minutes
+    resourceType: pod
+    severity: high
+    problemType: pending
+    conditions:
+      - field: phase
+        operator: eq
+        value: Pending
+      - field: age
+        operator: gte
+        value: "300"
+    title: "Pod {{.Name}} pending for extended time"
+    message: "Pod {{.Name}} in namespace {{.Namespace}} has been pending for more than 5 minutes."
+    possibleCauses:
+      - "Insufficient cluster resources"
+      - "Node selector or affinity rules too restrictive"
+      - "PersistentVolumeClaim not bound"
+      - "Image pull issues"
+    suggestions:
+      - "Check pod events: kubectl describe pod {{.Name}} -n {{.Namespace}}"
+      - "Review cluster resource availability"
+      - "Check PVC status if using persistent volumes"
+      - "Verify image exists and is accessible"
+
+  - name: critical-namespace-pod-failure
+    enabled: true
+    description: Detect failing pods in critical namespaces
+    resourceType: pod
+    severity: critical
+    problemType: containererror
+    conditions:
+      - field: namespace
+        operator: in
+        value: "kube-system,monitoring,istio-system"
+      - field: status
+        operator: notcontains
+        value: Running
+      - field: phase
+        operator: ne
+        value: Succeeded
+    title: "Critical pod {{.Name}} not running"
+    message: "Pod {{.Name}} in critical namespace {{.Namespace}} is in {{.Status}} state."
+    possibleCauses:
+      - "System component failure"
+      - "Resource exhaustion"
+      - "Configuration error"
+      - "Image issues"
+    suggestions:
+      - "Immediately investigate pod logs"
+      - "Check node status where pod is scheduled"
+      - "Review recent changes to the namespace"
+      - "Escalate if this affects cluster operations"

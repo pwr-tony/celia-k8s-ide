@@ -65,3 +65,50 @@ func (h *TroubleHandler) GetDiagnosis(w http.ResponseWriter, r *http.Request) {
 
 	writeJSON(w, http.StatusOK, diagnosis)
 }
+
+func (h *TroubleHandler) GetCustomRules(w http.ResponseWriter, r *http.Request) {
+	rules := h.service.GetCustomRules()
+
+	type ruleResponse struct {
+		Name         string            `json:"name"`
+		Enabled      bool              `json:"enabled"`
+		Description  string            `json:"description"`
+		ResourceType string            `json:"resourceType"`
+		Severity     string            `json:"severity"`
+		ProblemType  string            `json:"problemType"`
+		Title        string            `json:"title"`
+		Labels       map[string]string `json:"labels,omitempty"`
+	}
+
+	response := make([]ruleResponse, 0, len(rules))
+	for _, rule := range rules {
+		response = append(response, ruleResponse{
+			Name:         rule.Name,
+			Enabled:      rule.Enabled,
+			Description:  rule.Description,
+			ResourceType: rule.ResourceType,
+			Severity:     rule.Severity,
+			ProblemType:  rule.ProblemType,
+			Title:        rule.Title,
+			Labels:       rule.Labels,
+		})
+	}
+
+	writeJSON(w, http.StatusOK, map[string]interface{}{
+		"rules": response,
+		"count": len(response),
+	})
+}
+
+func (h *TroubleHandler) ReloadCustomRules(w http.ResponseWriter, r *http.Request) {
+	err := h.service.ReloadCustomRules()
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	writeJSON(w, http.StatusOK, map[string]interface{}{
+		"message": "Rules reloaded successfully",
+		"count":   h.service.GetCustomRuleCount(),
+	})
+}

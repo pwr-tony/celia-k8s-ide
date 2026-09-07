@@ -57,6 +57,7 @@ type TroubleConfig struct {
 	Enabled           bool          `yaml:"enabled"`
 	DetectionInterval time.Duration `yaml:"detection_interval"`
 	Detectors         []string      `yaml:"detectors"`
+	RulesDirectory    string        `yaml:"rules_directory"`
 }
 
 func Default() *Config {
@@ -102,7 +103,9 @@ func Default() *Config {
 				"node_notready",
 				"node_pressure",
 				"high_restart",
+				"custom",
 			},
+			RulesDirectory: "~/.celia/rules",
 		},
 	}
 }
@@ -132,6 +135,7 @@ func Load(path string) (*Config, error) {
 
 	cfg.Audit.Directory = expandPath(cfg.Audit.Directory)
 	cfg.Kubernetes.Kubeconfig = expandPath(cfg.Kubernetes.Kubeconfig)
+	cfg.Trouble.RulesDirectory = expandPath(cfg.Trouble.RulesDirectory)
 
 	return cfg, nil
 }
