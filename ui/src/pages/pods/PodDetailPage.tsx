@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router'
 import { usePod } from '@/api/hooks'
 import { ResourceDetailLayout, ResourceYAMLTab, ResourceEventsTab } from '@/components/domain/ResourceDetail'
-import { PodOverview, PodContainersTab, PodLogsTab, PodMetricsTab, PodTerminalTab } from '@/components/domain/pods'
+import { PodOverview, PodContainersTab, PodLogsTab, PodMetricsTab, PodTerminalTab, LogCompareTab } from '@/components/domain/pods'
 import { DeletePodDialog } from '@/components/operations'
 import { Button, Kbd } from '@/components/primitives'
 import { getPodStatus, DetailPageSkeleton, EmptyState } from '@/components/data'
@@ -55,6 +55,8 @@ export function PodDetailPage() {
     )
   }
 
+  const hasMultipleContainers = pod.Containers && pod.Containers.length >= 2
+
   const tabs = [
     { id: 'overview', label: 'Overview', content: <PodOverview pod={pod} /> },
     { id: 'containers', label: 'Containers', content: <PodContainersTab pod={pod} /> },
@@ -62,6 +64,7 @@ export function PodDetailPage() {
     { id: 'yaml', label: 'YAML', content: <ResourceYAMLTab kind="Pod" namespace={namespace!} name={name!} /> },
     { id: 'events', label: 'Events', content: <ResourceEventsTab namespace={namespace!} resourceName={name!} resourceKind="Pod" /> },
     { id: 'logs', label: 'Logs', content: <PodLogsTab namespace={namespace!} podName={name!} containers={pod.Containers} /> },
+    ...(hasMultipleContainers ? [{ id: 'compare', label: 'Compare Logs', content: <LogCompareTab namespace={namespace!} podName={name!} containers={pod.Containers} /> }] : []),
     { id: 'terminal', label: 'Terminal', content: <PodTerminalTab namespace={namespace!} podName={name!} containers={pod.Containers} /> },
   ]
 

@@ -99,7 +99,7 @@
 - [x] Terminal/exec to pods (xterm.js)
 - [x] PVC/PV explorer
 - [x] Ingress explorer
-- [ ] Multi-container log comparison (side-by-side)
+- [x] Multi-container log comparison (side-by-side)
 - [ ] Export problems report (PDF/HTML)
 - [ ] Desktop notifications for critical problems
 - [ ] Multi-cluster aggregation
