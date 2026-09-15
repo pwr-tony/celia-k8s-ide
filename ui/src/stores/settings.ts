@@ -5,6 +5,7 @@ export interface SeverityThresholds {
   notificationMinSeverity: 1 | 2 | 3 | 4
   highlightMinSeverity: 1 | 2 | 3 | 4
   soundEnabled: boolean
+  desktopNotificationsEnabled: boolean
 }
 
 interface SettingsState extends SeverityThresholds {
@@ -16,6 +17,7 @@ const defaults: SeverityThresholds = {
   notificationMinSeverity: 2,
   highlightMinSeverity: 3,
   soundEnabled: false,
+  desktopNotificationsEnabled: true,
 }
 
 export const useSettingsStore = create<SettingsState>()(

@@ -1,6 +1,7 @@
 import { useSettingsStore } from '@/stores/settings'
 import { Button } from '@/components/primitives'
-import { AlertTriangle, AlertCircle, AlertOctagon, Info, RotateCcw } from 'lucide-react'
+import { AlertTriangle, AlertCircle, AlertOctagon, Info, RotateCcw, Monitor } from 'lucide-react'
+import { isTauri } from '@/lib/environment'
 
 const severityOptions = [
   { value: 1, label: 'Low', icon: Info, color: 'text-text-tertiary' },
@@ -14,6 +15,7 @@ export function SeveritySettings() {
     notificationMinSeverity,
     highlightMinSeverity,
     soundEnabled,
+    desktopNotificationsEnabled,
     setSeverityThreshold,
     resetDefaults,
   } = useSettingsStore()
@@ -94,6 +96,32 @@ export function SeveritySettings() {
           <p className="text-xs text-text-tertiary mt-1.5">
             Problems with severity {highlightMinSeverity} and above will be visually highlighted
           </p>
+        </div>
+
+        <div className="flex items-center justify-between pt-2 border-t border-border-subtle">
+          <div className="flex items-center gap-2">
+            <Monitor className="h-4 w-4 text-text-tertiary" />
+            <div>
+              <label className="text-sm text-text-secondary">Desktop notifications</label>
+              <p className="text-xs text-text-tertiary">
+                {isTauri() ? 'Show native OS notifications' : 'Show browser notifications'}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => setSeverityThreshold('desktopNotificationsEnabled', !desktopNotificationsEnabled)}
+            className={`
+              w-11 h-6 rounded-full transition-colors relative
+              ${desktopNotificationsEnabled ? 'bg-accent' : 'bg-bg-tertiary'}
+            `}
+          >
+            <span
+              className={`
+                absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform
+                ${desktopNotificationsEnabled ? 'left-5' : 'left-0.5'}
+              `}
+            />
+          </button>
         </div>
 
         <div className="flex items-center justify-between pt-2 border-t border-border-subtle">

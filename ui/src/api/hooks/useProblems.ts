@@ -5,6 +5,7 @@ import { getWebSocket } from '../websocket'
 import { useNotificationsStore } from '@/stores/notifications'
 import { useProblemHistoryStore } from '@/stores/problem-history'
 import { useSettingsStore } from '@/stores/settings'
+import { sendDesktopNotification } from '@/lib/notifications'
 import {
   ProblemsResponseSchema,
   ProblemStatsSchema,
@@ -53,6 +54,7 @@ export function useProblemsRealtime() {
   const addNotification = useNotificationsStore((s) => s.addNotification)
   const trackResolved = useProblemHistoryStore((s) => s.trackResolved)
   const notificationMinSeverity = useSettingsStore((s) => s.notificationMinSeverity)
+  const desktopNotificationsEnabled = useSettingsStore((s) => s.desktopNotificationsEnabled)
   const previousProblemsRef = useRef<Set<string>>(new Set())
 
   useEffect(() => {
@@ -81,6 +83,14 @@ export function useProblemsRealtime() {
               message: `${problem.resource_kind} ${problem.namespace}/${problem.resource_name}`,
               problemId: problem.id,
             })
+
+            if (desktopNotificationsEnabled) {
+              sendDesktopNotification(
+                problem.title,
+                `${problem.resource_kind} ${problem.namespace}/${problem.resource_name}`,
+                problem.severity as 1 | 2 | 3 | 4
+              )
+            }
           }
         }
       })
@@ -94,5 +104,5 @@ export function useProblemsRealtime() {
       unsubscribe()
       ws.unsubscribeProblems()
     }
-  }, [queryClient, addNotification, trackResolved, notificationMinSeverity])
+  }, [queryClient, addNotification, trackResolved, notificationMinSeverity, desktopNotificationsEnabled])
 }
